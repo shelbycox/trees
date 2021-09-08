@@ -1,0 +1,320 @@
+import pygame
+import sys
+import math
+import ast
+from prufer import *
+from tropicalLines import *
+from drawTree import *
+from mouseover import *
+
+##test
+#from drawTreeTest import verts, edges
+
+##special starting trees
+##gives an example of a line segment in codimension 1
+u = {(1, 2): Decimal('1.812818731767486535311206808'), (2, 1): Decimal('1.812818731767486535311206808'), (1, 3): Decimal('1.999999999999999986122212192'), (3, 1): Decimal('1.999999999999999986122212192'), (1, 4): Decimal('1.812818731767486555260526781'), (4, 1): Decimal('1.812818731767486555260526781'), (1, 5): Decimal('1.812818731767486555260526781'), (5, 1): Decimal('1.812818731767486555260526781'), (1, 6): Decimal('1.283451600689563987245378485'), (6, 1): Decimal('1.283451600689563987245378485'), (1, 7): Decimal('1.283451600689563987245378485'), (7, 1): Decimal('1.283451600689563987245378485'), (1, 8): Decimal('1.812818731767486555260526782'), (8, 1): Decimal('1.812818731767486555260526782'), (2, 3): Decimal('1.999999999999999986122212192'), (3, 2): Decimal('1.999999999999999986122212192'), (2, 4): Decimal('0.3556425845068801527490420789'), (4, 2): Decimal('0.3556425845068801527490420789'), (2, 5): Decimal('0.3556425845068801527490420789'), (5, 2): Decimal('0.3556425845068801527490420789'), (2, 6): Decimal('1.812818731767486535311206807'), (6, 2): Decimal('1.812818731767486535311206807'), (2, 7): Decimal('1.812818731767486535311206807'), (7, 2): Decimal('1.812818731767486535311206807'), (2, 8): Decimal('0.3556425845068801527490420789'), (8, 2): Decimal('0.3556425845068801527490420789'), (3, 4): Decimal('2.000000000000000006071532165'), (4, 3): Decimal('2.000000000000000006071532165'), (3, 5): Decimal('2.000000000000000006071532165'), (5, 3): Decimal('2.000000000000000006071532165'), (3, 6): Decimal('1.999999999999999986122212192'), (6, 3): Decimal('1.999999999999999986122212192'), (3, 7): Decimal('1.999999999999999986122212192'), (7, 3): Decimal('1.999999999999999986122212192'), (3, 8): Decimal('2.000000000000000006071532166'), (8, 3): Decimal('2.000000000000000006071532166'), (4, 5): Decimal('0.2441033534391901238524980044'), (5, 4): Decimal('0.2441033534391901238524980044'), (4, 6): Decimal('1.812818731767486555260526781'), (6, 4): Decimal('1.812818731767486555260526781'), (4, 7): Decimal('1.812818731767486555260526781'), (7, 4): Decimal('1.812818731767486555260526781'), (4, 8): Decimal('0.3488717430472289549037157030'), (8, 4): Decimal('0.3488717430472289549037157030'), (5, 6): Decimal('1.812818731767486555260526781'), (6, 5): Decimal('1.812818731767486555260526781'), (5, 7): Decimal('1.812818731767486555260526781'), (7, 5): Decimal('1.812818731767486555260526781'), (5, 8): Decimal('0.3488717430472289549037157030'), (8, 5): Decimal('0.3488717430472289549037157030'), (6, 7): Decimal('0.7276352667357482983945260458'), (7, 6): Decimal('0.7276352667357482983945260458'), (6, 8): Decimal('1.812818731767486555260526782'), (8, 6): Decimal('1.812818731767486555260526782'), (7, 8): Decimal('1.812818731767486555260526782'), (8, 7): Decimal('1.812818731767486555260526782')}
+v = {(1, 2): Decimal('0.2480995752470239188239298223'), (2, 1): Decimal('0.2480995752470239188239298223'), (1, 3): Decimal('0.2022544124183351943457864764'), (3, 1): Decimal('0.2022544124183351943457864764'), (1, 4): Decimal('0.3855349173896214128032244872'), (4, 1): Decimal('0.3855349173896214128032244872'), (1, 5): Decimal('0.2480995752470239257628237261'), (5, 1): Decimal('0.2480995752470239257628237261'), (1, 6): Decimal('0.2480995752470239188239298223'), (6, 1): Decimal('0.2480995752470239188239298223'), (1, 7): Decimal('0.2480995752470239257628237261'), (7, 1): Decimal('0.2480995752470239257628237261'), (1, 8): Decimal('1.999999999999999989591659144'), (8, 1): Decimal('1.999999999999999989591659144'), (2, 3): Decimal('0.2480995752470239188239298223'), (3, 2): Decimal('0.2480995752470239188239298223'), (2, 4): Decimal('0.3855349173896214067316923213'), (4, 2): Decimal('0.3855349173896214067316923213'), (2, 5): Decimal('0.2352939894461271337633423428'), (5, 2): Decimal('0.2352939894461271337633423428'), (2, 6): Decimal('0.2182106240265924701482447290'), (6, 2): Decimal('0.2182106240265924701482447290'), (2, 7): Decimal('0.2352939894461271337633423428'), (7, 2): Decimal('0.2352939894461271337633423428'), (2, 8): Decimal('1.999999999999999983520126978'), (8, 2): Decimal('1.999999999999999983520126978'), (3, 4): Decimal('0.3855349173896214128032244872'), (4, 3): Decimal('0.3855349173896214128032244872'), (3, 5): Decimal('0.2480995752470239257628237261'), (5, 3): Decimal('0.2480995752470239257628237261'), (3, 6): Decimal('0.2480995752470239188239298223'), (6, 3): Decimal('0.2480995752470239188239298223'), (3, 7): Decimal('0.2480995752470239257628237261'), (7, 3): Decimal('0.2480995752470239257628237261'), (3, 8): Decimal('1.999999999999999989591659144'), (8, 3): Decimal('1.999999999999999989591659144'), (4, 5): Decimal('0.3855349173896214136705862251'), (5, 4): Decimal('0.3855349173896214136705862251'), (4, 6): Decimal('0.3855349173896214067316923213'), (6, 4): Decimal('0.3855349173896214067316923213'), (4, 7): Decimal('0.3855349173896214136705862251'), (7, 4): Decimal('0.3855349173896214136705862251'), (4, 8): Decimal('2.000000000000000000000000000'), (8, 4): Decimal('2.000000000000000000000000000'), (5, 6): Decimal('0.2352939894461271337633423428'), (6, 5): Decimal('0.2352939894461271337633423428'), (5, 7): Decimal('0.2165910006041585900149470944'), (7, 5): Decimal('0.2165910006041585900149470944'), (5, 8): Decimal('1.999999999999999990459020882'), (8, 5): Decimal('1.999999999999999990459020882'), (6, 7): Decimal('0.2352939894461271337633423428'), (7, 6): Decimal('0.2352939894461271337633423428'), (6, 8): Decimal('1.999999999999999983520126978'), (8, 6): Decimal('1.999999999999999983520126978'), (7, 8): Decimal('1.999999999999999990459020882'), (8, 7): Decimal('1.999999999999999990459020882')}
+print(argmaxm(u))
+print(argmaxm(v))
+
+line = normalize_heights(get_line_int(u,v), 2)
+
+trees = [rec_vertices(T, 375/2, rec_tree_paren(T, [i+1 for i in range(8)]), 300/2, None, [], []) for T in line]
+
+n = 9
+
+##drawing methods
+##draws the trees (i-1), i, (i+1) in a row (if they all exist)
+def draw_trees(trees, i):
+	##draws the tree i in the middle
+	draw_tree(trees[i][0], trees[i][1], 1)
+
+	if i - 1 >= 0:
+		draw_tree(trees[i-1][0], trees[i-1][1], 0)
+
+	if i + 1 < len(trees):
+		draw_tree(trees[i+1][0], trees[i+1][1], 2)
+
+##draws a tree, given the position of vertices and edges
+##the box number 0, 1, or 2 puts it in the left, right or center box
+def draw_tree(vt, ed, box):
+	for e in ed:
+		start, end = e
+		if len(start) > 2:
+			start = (start[0], 555)
+		if len(end) > 2:
+			end = (end[0], 555)
+		start = (start[0] + box*350, start[1])
+		end = (end[0] + box*350, end[1])
+		pygame.draw.line(screen, black, start, end, 1)
+
+	for v in vt:
+		if v[1] == 0:
+			##put the number of the vertex at 560
+			v_label = font.render(str(v[2]), True, (0, 0, 0))
+			screen.blit(v_label, dest=(v[0] - 5 + box*350, 555))
+		else:
+			pygame.draw.circle(screen, black, (v[0] + box*350, v[1]), 5, 0)
+
+##generate a "picture" of the tropical line
+##n is the number of turning points
+def gen_line(n):
+	x_values = [i*2*math.pi/(n-1) for i in range(n)]
+	points = [(x*(625/(2*math.pi)) + 25, (math.sin(x) + 1.5)*100) for x in x_values]
+	return points
+
+##draws the basic background, P is the list of points on the tropical line
+def draw_background(P):
+	##make the background color
+	screen.fill(white)
+
+	##draw the tropical line
+	pygame.draw.lines(screen, black, False, P, 2)
+	for p in P:
+		pygame.draw.circle(screen, darkGreen, p, 10, 0)
+
+
+	##draw a space for the tree display
+	R = [(25,300), (350, 300), (350, 575), (25, 575)]
+	pygame.draw.lines(screen, black, True, R, 1)
+	R = [(a + 350, b) for (a,b) in R]
+	pygame.draw.lines(screen, black, True, R, 1)
+	R = [(a + 350, b) for (a,b) in R]
+	pygame.draw.lines(screen, black, True, R, 1)
+
+	##draw guide lines for the heights
+	for i in range(n-2):
+		h = 545 - (250/n)*i
+		pygame.draw.line(screen, pink, (25, h), (350, h), 1)
+		pygame.draw.line(screen, pink, (375, h), (375 + 325, h), 1)
+		pygame.draw.line(screen, pink, (375 + 350, h), (375 + 675, h), 1)
+
+	if current != None:
+		##space for fine codim, coarse codim
+		text_surface_1 = font.render('fcd: ' + str(get_fine_codim(line[current[-1]])), True, (0, 0, 0))
+		screen.blit(text_surface_1, dest=(400, 310))
+		text_surface_2 = font.render('ccd:', True, (0, 0, 0))
+		screen.blit(text_surface_2, dest=(400, 335))
+
+		draw_trees(trees, 2*current[-1] + current[0])
+
+		if current[0] == 0:
+			pygame.draw.circle(screen, blue, current[1], 5, 0)
+
+		if current[0] == 1:
+			pygame.draw.circle(screen, blue, ((current[1][0] + current[2][0])/2, (current[1][1] + current[2][1])/2), 5, 0)
+
+	##draw the generate random trees button
+	pygame.draw.rect(screen, green, button)
+	random_button_text = font.render('random trees', True, (0,0,0))
+	screen.blit(random_button_text, dest=(735, 115))
+
+	##draw the save button
+	pygame.draw.rect(screen, lightBlue, save_button)
+	save_button_text = font.render('save', True, (0,0,0))
+	screen.blit(save_button_text, dest=(735, 190))
+
+	##draw the load button
+	pygame.draw.rect(screen, pink, load_button)
+	load_button_text = font.render('load', True, (0,0,0))
+	screen.blit(load_button_text, dest=(735, 40))
+
+##color names
+red = (255,0,0)
+green = (0,255,0)
+lightBlue = (10,255,255)
+blue = (0,0,255)
+white = (255,255,255)
+black = (0,0,0)
+pink = (255,200,200)
+darkGreen = (5, 146, 5)
+
+##start the game
+pygame.init()
+
+font = pygame.font.Font(pygame.font.get_default_font(), 18)
+
+##start the screen
+screen = pygame.display.set_mode((1100, 620))
+
+##button to generate some random trees
+button = pygame.Rect(725, 100, 150, 50)
+
+##button to save the current trees
+save_button = pygame.Rect(725, 175, 150, 50)
+
+##button to load an example
+load_button = pygame.Rect(725, 25, 150, 50)
+
+##get points
+P = gen_line(int((len(line) + 1)/2))
+lines = [(P[i], P[i+1]) for i in range(len(P) - 1)]
+
+##center of tree display box
+center = (375/2, 875/2)
+
+##keeps track of the current tree being displayed
+current = None
+
+##make the background image
+draw_background(P)
+
+while True:
+	for event in pygame.event.get():
+		##check for quit events
+		if event.type == pygame.QUIT:
+			pygame.quit(); sys.exit();
+
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			mouse_pos = event.pos  # gets mouse position
+			# checks if mouse position is over the button
+			if button.collidepoint(mouse_pos):
+				# prints current location of mouse
+				T1 = gen_tree(n+1)
+				up = get_metric(T1)
+				u = {(i,j) : up[(i,j)] for (i,j) in up.keys() if i != 0 and j != 0}
+				
+				T2 = gen_tree(n+1)
+				vp = get_metric(T2)
+				v = {(i,j) : vp[(i,j)] for (i,j) in vp.keys() if i != 0 and j != 0}
+
+				line = normalize_heights(get_line_int(u,v), 2)
+
+				trees = [rec_vertices(T, 375/2, rec_tree_paren(T, [i+1 for i in range(n)]), 300/2, None, [], []) for T in line]
+
+				##get points
+				P = gen_line(int((len(line) + 1)/2))
+				lines = [(P[i], P[i+1]) for i in range(len(P) - 1)]
+
+				current = None
+
+				draw_background(P)
+
+
+			if save_button.collidepoint(mouse_pos):
+				##save the first and last trees!
+				u = line[0]
+				v = line[-1]
+				
+				with open('tree_example.txt', 'w') as f:
+					f.write(str(u))
+					f.write('\n')
+					f.write(str(v))
+
+			if load_button.collidepoint(mouse_pos):
+				##load the trees as the first and last
+				examples = []
+				try:
+					with open('tree_example.txt', 'r') as f:
+						s = f.readline()
+						while s:
+							t = ast.literal_eval(s)
+							examples.append(t)
+							s = f.readline()
+
+					##get the line between the two trees
+					u, v = examples
+					line = normalizeHeights(getLineWInt(u,v), 2)
+					trees = [rec_vertices(T, 375/2, recTreeParen(T, [i+1 for i in range(9)]), 300/2, None, [], []) for T in line]
+
+					##get points
+					P = gen_line(int((len(line) + 1)/2))
+					lines = [(P[i], P[i+1]) for i in range(len(P) - 1)]
+
+					##reset the background for this example
+					draw_background(P)
+
+					##remove the blue placeholder
+					current = None
+
+				except FileNotFoundError:
+					print('No file to load!')
+
+		##check for arrow presses
+		elif event.type == pygame.KEYDOWN:
+			if current == None:
+				pass
+			elif event.key == pygame.K_LEFT:
+				i = current[-1]
+				if i == 0 and current[0] == 0:
+					pass
+
+				##if we're currently on a circle
+				elif current[0] == 0:
+					i = i - 1
+					a = lines[i][0]
+					b = lines[i][1]
+					current = (not current[0], a, b, i)
+					# verts, edges = trees[2*i + 1]
+					# draw_tree(verts, edges, 1)
+					draw_trees(trees, 2*i + 1)
+				##otherwise we're on a line
+				else:
+					current = (not current[0], P[i], i)
+					# verts, edges = trees[2*i]
+					# draw_tree(verts, edges, 1)
+					draw_trees(trees, 2*i)
+
+			elif event.key == pygame.K_RIGHT:
+				i = current[-1]
+				if current[0] == 0 and i == len(P) - 1:
+					pass
+
+				##FOR k = -1 ONLY!!!
+				##if we're currently on a circle
+				elif current[0] == 0:
+					a = lines[i][0]
+					b = lines[i][1]
+					current = (not current[0], a, b, i)
+					# verts, edges = trees[2*i + 1]
+					# draw_tree(verts, edges, 1)
+					draw_trees(trees, 2*i + 1)
+				##otherwise we're on a line
+				else:
+					i = i + 1
+					current = (not current[0], P[i], i)
+					# verts, edges = trees[2*i]
+					# draw_tree(verts, edges, 1)
+					draw_trees(trees, 2*i)
+
+			draw_background(P)
+
+
+	##check if the mouse is over one of the circles
+	over_circle = -1
+	r = 10
+	for i in range(len(P)):
+		p = P[i]
+		if detect_mouse_circle(p, r):
+			over_circle = i
+			current = (0, p, i)
+			break
+
+	if over_circle != -1:
+		draw_background(P)
+		# verts, edges = trees[2*over_circle]
+		# draw_tree(verts, edges, 1)
+		draw_trees(trees, 2*over_circle)
+
+	else:
+		##check if the mouse is over one of the lines
+		over_line = -1
+		for i in range(len(lines)):
+			a, b = lines[i]
+			if detect_mouse_line(a,b, 10):
+				over_line = i
+				##record the type of current is a line (1), start and end points, and the index of the line
+				current = (1, a, b, i)
+				break
+
+		if over_line != -1:
+			draw_background(P)
+			# verts, edges = trees[2*over_line + 1]
+			# draw_tree(verts, edges, 1)
+			draw_trees(trees, 2*over_line + 1)
+
+		else:
+			draw_background(P)
+
+	##update the display
+	pygame.display.update()
