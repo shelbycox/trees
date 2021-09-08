@@ -1,11 +1,47 @@
 import numpy as np
 import networkx as nx
-
+from decimal import *
+##rounding digits
+digits = 6
+##for testing
 count = 0
+
+##gets a random decimal from the interval [a,b]
+def rand_dec(a,b,digits=7):
+	f = np.random.uniform(a,b - Decimal(.1))
+
+	return Decimal(str(f))
+
+##given the adjacency matrix for a tree, find the Prufer sequence
+def get_prufer(T):
+	P = []
+	u = 0
+	while u < len(T):
+		##if i is a leaf
+		if np.count_nonzero(T[u]) == 1:
+			##find the vertex adjacent to i
+			v = -1
+			for i in range(len(T)):
+				if T[u][i] != 0:
+					v = i
+					break
+
+			##add it to the Prufer sequence
+			P.append(v)
+
+			##remove the edges from i to v
+			T[u][v] = 0
+			T[v][u] = 0
+
+			##reset u to the start of the list
+			u = 0
+		else:
+			u = u + 1
+	return P
 
 ##use Prufer sequence to generate trees
 ##TESTED
-def buildTree(a):
+def build_tree(a):
 	n = len(a) + 2
 
 	##make a list that records degrees
@@ -42,7 +78,7 @@ def buildTree(a):
 
 ##generate a random trivalent tree on l leaves
 ##TESTED
-def genTree(l, eq=True):
+def gen_tree(l, eq=True):
 	##a trivalent tree on n leaves has n-2 internal vertices
 	n = l + (l - 2)
 
@@ -53,17 +89,16 @@ def genTree(l, eq=True):
 	perm = np.random.permutation(range(2*len(internal)))
 	a = [internal[int(p/2)] for p in perm]
 
-	T = buildTree(a)
+	T = build_tree(a)
 
 	if eq:
-		return makeEq(T)
+		return make_eq(T)
 
 	return T
 
-def findLengths(T,d,u,l):
+##TESTED
+def find_lengths(T,d,u,l):
 	##if T is the zero matrix we're done, so return the distances
-	#print(T)
-	#print('u, deg(u) are: ', u, np.count_nonzero(T[u]))
 	if np.count_nonzero(T) == 0:
 		#print('T is zero! ', d)
 		return d
@@ -78,18 +113,6 @@ def findLengths(T,d,u,l):
 			else:
 				w = j
 				break
-	#print('v, w are: ', v, w)
-
-	##if we didn't get two nodes, something went wrong
-	##u should NEVER be a leaf (we never pass a leaf into the recursion)
-	#if v == -1:
-		#print('ERROR: v = -1', T[u])
-
-	#if v == w:
-		#print('ERROR: v = w')
-
-	#if w == -1:
-		#print('ERROR: w = -1')
 
 	##get the degrees of those vertices
 	deg_v = np.count_nonzero(T[v])
@@ -106,10 +129,10 @@ def findLengths(T,d,u,l):
 	if deg_v == 1 and deg_w == 1:
 		##set the lengths to the two leaves
 		#print('in first case')
-		d[u][v] = l
-		d[v][u] = l
-		d[u][w] = l
-		d[w][u] = l
+		d[u][v] = Decimal(l)
+		d[v][u] = Decimal(l)
+		d[u][w] = Decimal(l)
+		d[w][u] = Decimal(l)
 		return d
 
 	##case 2: the other two vertices connected to u are a leaf and an internal node
@@ -117,12 +140,12 @@ def findLengths(T,d,u,l):
 		##v is the leaf, w is the internal node
 		##set the length to the leaf
 		#print('set length to v')
-		d[u][v] = l
-		d[v][u] = l
+		d[u][v] = Decimal(l)
+		d[v][u] = Decimal(l)
 
 		##set the length from u to w to be a random number less than l
 		#print('set length to w')
-		lr = np.random.uniform(0,l)
+		lr = rand_dec(0,l)
 		d[u][w] = lr
 		d[w][u] = lr
 
@@ -130,44 +153,42 @@ def findLengths(T,d,u,l):
 
 		##and recurse to find the lengths from the other node
 		#print('recursing')
-		return findLengths(T,d,w,l-lr)
+		return find_lengths(T,d,w,Decimal(l-lr))
 
 	elif deg_v == 3 and deg_w == 1:
 		##w is the leaf, v is the internal node
 		##set the length to the leaf
-		d[u][w] = l
-		d[w][u] = l
+		d[u][w] = Decimal(l)
+		d[w][u] = Decimal(l)
 
 		##set the length from u to v to be a random number less than l
-		lr = np.random.uniform(0,l)
+		lr = rand_dec(0,l)
 		d[u][v] = lr
 		d[v][u] = lr
 
 		##and recurse to find the lengths from the other node
-		return findLengths(T,d,v,l-lr)
+		return find_lengths(T,d,v,Decimal(l-lr))
 	
 	##case 3: both nodes are internal
 	elif deg_v == 3 and deg_w == 3:
 		##set the length to v
-		l1 = np.random.uniform(0,l)
+		l1 = rand_dec(0,l)
 		d[u][v] = l1
 		d[v][u] = l1
 
 		##set the length to w
-		l2 = np.random.uniform(0,l)
+		l2 = rand_dec(0,l)
 		d[u][w] = l2
 		d[w][u] = l2
 
 		##recurse
-		#print('does d get edited?', d)
-		d = findLengths(T,d,v,l-l1)
-		#print(d)
-		return findLengths(T,d,w,l-l2)
-		#print(d)
+		d = find_lengths(T,d,v,l-l1)
+		return find_lengths(T,d,w,l-l2)
 
 ##make the trees equidistant
 ##takes 0 to be the root always
-def makeEq(T):
+##TESTED
+def make_eq(T):
 	T_copy = T.copy()
 	n = len(T)
 
@@ -186,7 +207,7 @@ def makeEq(T):
 			T_copy[u][0] = 0
 			break
 
-	d = findLengths(T_copy,d,u,1)
+	d = find_lengths(T_copy,d,u,1)
 	##add back the edges to 0
 	d[0][u] = 1
 	d[u][0] = 1
@@ -194,7 +215,8 @@ def makeEq(T):
 	return d
 
 ##given a metric tree D and two vertices, i and j, finds the distnace between them
-def getDist(D,i,j,d):
+##TESTED
+def get_dist(D,i,j,d):
 	#print('i, j are: ', i, j)
 
 	##if we reached j, then return the current distance
@@ -220,14 +242,15 @@ def getDist(D,i,j,d):
 	temp_dist = D[i].copy()
 	##remove the edges we just used
 	for k in adjacent:
-		D[i][k] = 0
-		D[k][i] = 0
+		D[i][k] = Decimal(0)
+		D[k][i] = Decimal(0)
 		#print('the new distance is:', d + temp_dist[k])
 
-	return max([getDist(D,k,j,d + temp_dist[k]) for k in adjacent])
+	return max([get_dist(D,k,j, Decimal(d) + Decimal(temp_dist[k])) for k in adjacent])
 
 ##given a trivalent tree with edges labelled with lengths, return the tree metric as a vector
-def getMetric(D):
+##TESTED
+def get_metric(D):
 	##get the total number of vertices
 	n = len(D)
 	##get the indices of the leaves, assuming they are first
@@ -238,13 +261,14 @@ def getMetric(D):
 
 	for i in range(l):
 		for j in range(i+1,l):
-			dij = getDist(D.copy(),i,j,0)
-			u[(i,j)] = dij
-			u[(j,i)] = dij
+			dij = get_dist(D.copy(),i,j,0)
+			u[(i,j)] = Decimal(dij)
+			u[(j,i)] = Decimal(dij)
 
 	return u
 
-def convertToNetworkX(tree):
+##TESTED
+def convert_to_nx(tree):
 	edges = []
 	for i in range(len(tree)):
 		for j in range(len(tree)):
@@ -255,7 +279,8 @@ def convertToNetworkX(tree):
 	G.add_edges_from(edges)
 	return G
 
-def sameEdges(R,T):
+##TESTED
+def same_edges(R,T):
 	if len(R) != len(T):
 		return False
 
@@ -272,14 +297,8 @@ def sameEdges(R,T):
 
 	return True
 
-R = buildTree([4,4,5,5])
-dR = makeEq(R)
-
-print(dR)
-print(getMetric(dR))
-
-S = genTree(10)
-m = getMetric(S)
-for i in range(1,10):
-	print(m[(0,i)])
-		
+u = gen_tree(9)
+print(get_metric(u))
+# for d in get_metric(u).values():
+# 	print(type(d))
+# print(type(Decimal('.1111111')))
