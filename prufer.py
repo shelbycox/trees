@@ -129,10 +129,10 @@ def find_lengths(T,d,u,l):
 	if deg_v == 1 and deg_w == 1:
 		##set the lengths to the two leaves
 		#print('in first case')
-		d[u][v] = Decimal(l)
-		d[v][u] = Decimal(l)
-		d[u][w] = Decimal(l)
-		d[w][u] = Decimal(l)
+		d[u][v] = l
+		d[v][u] = l
+		d[u][w] = l
+		d[w][u] = l
 		return d
 
 	##case 2: the other two vertices connected to u are a leaf and an internal node
@@ -140,12 +140,12 @@ def find_lengths(T,d,u,l):
 		##v is the leaf, w is the internal node
 		##set the length to the leaf
 		#print('set length to v')
-		d[u][v] = Decimal(l)
-		d[v][u] = Decimal(l)
+		d[u][v] = l
+		d[v][u] = l
 
 		##set the length from u to w to be a random number less than l
 		#print('set length to w')
-		lr = rand_dec(0,l)
+		lr = np.random.uniform(0,l)
 		d[u][w] = lr
 		d[w][u] = lr
 
@@ -153,31 +153,31 @@ def find_lengths(T,d,u,l):
 
 		##and recurse to find the lengths from the other node
 		#print('recursing')
-		return find_lengths(T,d,w,Decimal(l-lr))
+		return find_lengths(T,d,w,l - lr)
 
 	elif deg_v == 3 and deg_w == 1:
 		##w is the leaf, v is the internal node
 		##set the length to the leaf
-		d[u][w] = Decimal(l)
-		d[w][u] = Decimal(l)
+		d[u][w] = l
+		d[w][u] = l
 
 		##set the length from u to v to be a random number less than l
-		lr = rand_dec(0,l)
+		lr = np.random.uniform(0,l)
 		d[u][v] = lr
 		d[v][u] = lr
 
 		##and recurse to find the lengths from the other node
-		return find_lengths(T,d,v,Decimal(l-lr))
+		return find_lengths(T,d,v,l-lr)
 	
 	##case 3: both nodes are internal
 	elif deg_v == 3 and deg_w == 3:
 		##set the length to v
-		l1 = rand_dec(0,l)
+		l1 = np.random.uniform(0,l)
 		d[u][v] = l1
 		d[v][u] = l1
 
 		##set the length to w
-		l2 = rand_dec(0,l)
+		l2 = np.random.uniform(0,l)
 		d[u][w] = l2
 		d[w][u] = l2
 
@@ -242,11 +242,11 @@ def get_dist(D,i,j,d):
 	temp_dist = D[i].copy()
 	##remove the edges we just used
 	for k in adjacent:
-		D[i][k] = Decimal(0)
-		D[k][i] = Decimal(0)
+		D[i][k] = 0
+		D[k][i] = 0
 		#print('the new distance is:', d + temp_dist[k])
 
-	return max([get_dist(D,k,j, Decimal(d) + Decimal(temp_dist[k])) for k in adjacent])
+	return max([get_dist(D,k,j, d + temp_dist[k]) for k in adjacent])
 
 ##given a trivalent tree with edges labelled with lengths, return the tree metric as a vector
 ##TESTED
@@ -262,8 +262,8 @@ def get_metric(D):
 	for i in range(l):
 		for j in range(i+1,l):
 			dij = get_dist(D.copy(),i,j,0)
-			u[(i,j)] = Decimal(dij)
-			u[(j,i)] = Decimal(dij)
+			u[(i,j)] = dij
+			u[(j,i)] = dij
 
 	return u
 
