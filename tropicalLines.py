@@ -1,6 +1,6 @@
 import operator
 
-error = 0.00001
+error = 0
 
 def normalize_heights(L, h):
 	for t in L:
@@ -39,12 +39,12 @@ def argmaxm(u):
 	global error
 	values = sorted(list(set(u.values())))
 	##account for rounding errors
-	rounded_values = [values[0]]
-	for v in values:
-		#if the next value differs by more than acceptable error, add it as a new value to the list
-		if abs(values[-1] - v) > error:
-			rounded_values.append(v)
-	return [[k for (k,v) in u.items() if v - rounded_values[-i] < error] for i in range(1,len(rounded_values)+1)]
+	# rounded_values = [values[0]]
+	# for v in values:
+	# 	#if the next value differs by more than acceptable error, add it as a new value to the list
+	# 	if abs(values[-1] - v) > error:
+	# 		rounded_values.append(v)
+	return [[k for (k,v) in u.items() if v == values[-i]] for i in range(1,len(values)+1)]
 
 ##should also implement a compare_trees_coarse
 
@@ -104,11 +104,10 @@ def get_line_int(u,v):
 def left_right_split(leaves, a):
 	left = [leaves[0]]
 	right = []
-	
-	i = leaves[0]
+
 	for k in range(1, len(leaves)):
 		j = leaves[k]
-		if (i,j) in a:
+		if (left[0],j) in a:
 			right.append(j)
 		else:
 			left.append(j)
@@ -126,7 +125,7 @@ def rec_tree_paren(u, leaves):
 	##split at the highest branches of the current (sub)tree
 	#print(argmaxm(u), leaves)
 	branches = split(leaves, argmaxm(u)[0])
-	print(argmaxm(u)[0])
+	# print('BRANCHES!', branches)
 	
 	##regard each branch as its own tree
 	rests = [tree_rest(u, b) for b in branches]
@@ -140,7 +139,7 @@ def split(leaves, a):
 		##left = leftmost branch, right = everything else,
 		##done = True only if right is itself a branch
 		left, right, done = left_right_split(leaves, a)
-		print(left, right, done)
+		# print(left, right, done)
 		
 		##add the leftmost branch to the list of splits
 		splits.append(left)
