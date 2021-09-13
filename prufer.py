@@ -6,13 +6,73 @@ digits = 6
 ##for testing
 count = 0
 
+class Tree():
+	def __init__(self, l, adj=None):
+		##records the adjacency matrix of the tree
+		self.l = l
+		self.leaves = [i for i in range(l)]
+		self.verts = [j for j in range(l+1, 2*l - 2)]
+
+		self.adj = adj.copy()
+		if self.adj is None:
+			self.adj = np.zeros((2*l - 2, 2*l - 2))
+			##THEN GENERATE A RANDOM TREE HERE!!!
+
+	def gen_tree(self):
+		'''generates a tree randomly if only the number of leaves is provided
+		there might be a better way to do this, say by calling the class
+		'''
+		pass
+
+	def get_prufer(self):
+		'''gets the prufer sequence for the tree
+		'''
+		##make a copy of the adjacency matrix to edit
+		T = self.adj.copy()
+		P = []
+		u = 0
+		while u < len(T):
+			##if i is a leaf
+			if np.count_nonzero(T[u]) == 1:
+				##find the vertex adjacent to i
+				v = -1
+				for i in range(len(T)):
+					if T[u][i] != 0:
+						v = i
+						break
+
+				##add it to the Prufer sequence
+				P.append(v)
+
+				##remove the edges from i to v
+				T[u][v] = 0
+				T[v][u] = 0
+
+				##reset u to the start of the list
+				u = 0
+			else:
+				u = u + 1
+		return P
+
+	def get_dist(self):
+		'''gets the distance between two vertices of the tree
+		'''
+		pass
+
+	def display_tree(self):
+		'''draws the tree in a new window
+		'''
+		pass
+
 ##gets a random decimal from the interval [a,b]
+##PROBABLY DON'T NEED THIS ANYMORE
 def rand_dec(a,b,digits=7):
 	f = np.random.uniform(a,b - Decimal(.1))
 
 	return Decimal(str(f))
 
 ##given the adjacency matrix for a tree, find the Prufer sequence
+##MOVED TO TREE CLASS
 def get_prufer(T):
 	P = []
 	u = 0
@@ -92,7 +152,8 @@ def gen_tree(l, eq=True):
 	T = build_tree(a)
 
 	if eq:
-		return make_eq(T)
+		T = make_eq(T)
+		return make_eq(T,True)
 
 	return T
 
@@ -104,6 +165,7 @@ def find_lengths(T,d,u,l):
 		return d
 
 	##get the two other vertices connected to u
+	##here u is a vertex, and this is a poor choice of notation
 	v = -1
 	w = -1
 	for j in range(len(T)):
@@ -124,6 +186,8 @@ def find_lengths(T,d,u,l):
 	T[v][u] = 0
 	T[u][w] = 0
 	T[w][u] = 0
+
+	# print(u, v, w, deg_v, deg_w)
 
 	##case 1: the two other vertices connected to u are leaves
 	if deg_v == 1 and deg_w == 1:
@@ -188,7 +252,7 @@ def find_lengths(T,d,u,l):
 ##make the trees equidistant
 ##takes 0 to be the root always
 ##TESTED
-def make_eq(T):
+def make_eq(T, use_int=False):
 	T_copy = T.copy()
 	n = len(T)
 
@@ -207,14 +271,112 @@ def make_eq(T):
 			T_copy[u][0] = 0
 			break
 
-	d = find_lengths(T_copy,d,u,1)
+	if use_int == False:
+		d = find_lengths(T_copy,d,u,1)
+
+	else:
+		r = get_ranking(T,n)
+		d = find_lengths_int(r,T_copy,d,u,len(r))
+
 	##add back the edges to 0
-	d[0][u] = 1
-	d[u][0] = 1
+	d[0][u] = int(1)
+	d[u][0] = int(1)
 
 	return d
 
-##given a metric tree D and two vertices, i and j, finds the distnace between them
+def find_lengths_int(ranks, T, d, u, l):
+	##if T is the zero matrix we're done, so return the distances
+	if np.count_nonzero(T) == 0:
+		#print('T is zero! ', d)
+		return d
+
+	##get the two other vertices connected to u
+	##here u is a vertex, and this is a poor choice of notation
+	v = -1
+	w = -1
+	for j in range(len(T)):
+		if T[u][j] > 0 and j != u:
+			if v == -1:
+				v = j
+			else:
+				w = j
+				break
+
+	##get the degrees of those vertices
+	deg_v = np.count_nonzero(T[v])
+	deg_w = np.count_nonzero(T[w])
+	#print('deg(v), deg(w) are: ', deg_v, deg_w)
+
+	##remove the edges to u
+	T[u][v] = 0
+	T[v][u] = 0
+	T[u][w] = 0
+	T[w][u] = 0
+
+	# print('ints', u, v, w, deg_v, deg_w)
+
+	##case 1: the two other vertices connected to u are leaves
+	if deg_v == 1 and deg_w == 1:
+		##set the lengths to the two leaves
+		#print('in first case')
+		d[u][v] = l
+		d[v][u] = l
+		d[u][w] = l
+		d[w][u] = l
+		return d
+
+	##case 2: the other two vertices connected to u are a leaf and an internal node
+	elif deg_v == 1 and deg_w == 3:
+		##v is the leaf, w is the internal node
+		##set the length to the leaf
+		#print('set length to v')
+		d[u][v] = l
+		d[v][u] = l
+
+		##set the length from u to w to be a random number less than l
+		#print('set length to w')
+		lr = ranks.index(w) - ranks.index(u)
+		d[u][w] = lr
+		d[w][u] = lr
+
+		#print(d)
+
+		##and recurse to find the lengths from the other node
+		#print('recursing')
+		return find_lengths_int(ranks,T,d,w,l - lr)
+
+	elif deg_v == 3 and deg_w == 1:
+		##w is the leaf, v is the internal node
+		##set the length to the leaf
+		d[u][w] = l
+		d[w][u] = l
+
+		##set the length from u to v to be a random number less than l
+		lr = ranks.index(v) - ranks.index(w)
+		d[u][v] = lr
+		d[v][u] = lr
+
+		##and recurse to find the lengths from the other node
+		return find_lengths_int(ranks,T,d,v,l-lr)
+	
+	##case 3: both nodes are internal
+	elif deg_v == 3 and deg_w == 3:
+		##set the length to v
+		l1 = ranks.index(v) - ranks.index(u)
+		d[u][v] = l1
+		d[v][u] = l1
+
+		##set the length to w
+		l2 = ranks.index(w) - ranks.index(u)
+		d[u][w] = l2
+		d[w][u] = l2
+
+		##recurse
+		d = find_lengths_int(ranks,T,d,v,l-l1)
+		return find_lengths_int(ranks,T,d,w,l-l2)
+
+##given a metric tree D and two vertices, i and j, finds the distance between them
+##make sure to pass in a COPY of D
 ##TESTED
 def get_dist(D,i,j,d):
 	#print('i, j are: ', i, j)
@@ -297,7 +459,21 @@ def same_edges(R,T):
 
 	return True
 
-u = gen_tree(9)
+##gets the ranking of internal vertices, returned from highest to lowest
+##needs the distance adjacency matrix as input
+def get_ranking(u, k):
+	##list of internal vertices
+	##assuming they are numbered last
+	verts = [i for i in range(int((k+2)/2),k)]
+
+	dist_to_root = {v : get_dist(u.copy(),0,v,0) for v in verts}
+
+	return sorted(dist_to_root, key=dist_to_root.get)
+
+u = gen_tree(5)
+# print(get_ranking(u, 16))
+# for i in range(9, 16):
+# 	print(i, get_dist(u.copy(), 0, i, 0))
 print(get_metric(u))
 # for d in get_metric(u).values():
 # 	print(type(d))
