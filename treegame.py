@@ -12,16 +12,18 @@ from mouseover import *
 
 ##special starting trees
 ##gives an example of a line segment in codimension 1
-u = {(1, 2): 4.0, (2, 1): 4.0, (1, 3): 6.0, (3, 1): 6.0, (1, 4): 4.0, (4, 1): 4.0, (2, 3): 6.0, (3, 2): 6.0, (2, 4): 2.0, (4, 2): 2.0, (3, 4): 6.0, (4, 3): 6.0}
-v = {(1, 2): 4.0, (2, 1): 4.0, (1, 3): 6.0, (3, 1): 6.0, (1, 4): 6.0, (4, 1): 6.0, (2, 3): 6.0, (3, 2): 6.0, (2, 4): 6.0, (4, 2): 6.0, (3, 4): 2.0, (4, 3): 2.0}
-print(argmaxm(u))
-print(argmaxm(v))
+u = {(1, 2): 10, (2, 1): 10, (1, 3): 200, (3, 1): 200, (1, 4): 200, (4, 1): 200, (1, 5): 2, (5, 1): 2, (1, 6): 10, (6, 1): 10, (1, 7): 200, (7, 1): 200, (1, 8): 200, (8, 1): 200, (2, 3): 200, (3, 2): 200, (2, 4): 200, (4, 2): 200, (2, 5): 10, (5, 2): 10, (2, 6): 6, (6, 2): 6, (2, 7): 200, (7, 2): 200, (2, 8): 200, (8, 2): 200, (3, 4): 12, (4, 3): 12, (3, 5): 200, (5, 3): 200, (3, 6): 200, (6, 3): 200, (3, 7): 4, (7, 3): 4, (3, 8): 12, (8, 3): 12, (4, 5): 200, (5, 4): 200, (4, 6): 200, (6, 4): 200, (4, 7): 12, (7, 4): 12, (4, 8): 8, (8, 4): 8, (5, 6): 10, (6, 5): 10, (5, 7): 200, (7, 5): 200, (5, 8): 200, (8, 5): 200, (6, 7): 200, (7, 6): 200, (6, 8): 200, (8, 6): 200, (7, 8): 12, (8, 7): 12}
+v = {(1, 2): 2, (2, 1): 2, (1, 3): 4, (3, 1): 4, (1, 4): 6, (4, 1): 6, (1, 5): 8, (5, 1): 8, (1, 6): 8, (6, 1): 8, (1, 7): 8, (7, 1): 8, (1, 8): 8, (8, 1): 8, (2, 3): 4, (3, 2): 4, (2, 4): 6, (4, 2): 6, (2, 5): 8, (5, 2): 8, (2, 6): 8, (6, 2): 8, (2, 7): 8, (7, 2): 8, (2, 8): 8, (8, 2): 8, (3, 4): 6, (4, 3): 6, (3, 5): 8, (5, 3): 8, (3, 6): 8, (6, 3): 8, (3, 7): 8, (7, 3): 8, (3, 8): 8, (8, 3): 8, (4, 5): 8, (5, 4): 8, (4, 6): 8, (6, 4): 8, (4, 7): 8, (7, 4): 8, (4, 8): 8, (8, 4): 8, (5, 6): 5, (6, 5): 5, (5, 7): 5, (7, 5): 5, (5, 8): 5, (8, 5): 5, (6, 7): 3, (7, 6): 3, (6, 8): 3, (8, 6): 3, (7, 8): 1, (8, 7): 1}
+# print(argmaxm(u))
+# print(argmaxm(v))
+# print(rec_tree_paren(u, [i+1 for i in range(6)]))
+# print(rec_tree_paren(v, [i+1 for i in range(6)]))
 
 line = normalize_heights(get_line_int(u,v), 2)
 
-trees = [rec_vertices(T, 375/2, rec_tree_paren(T, [i+1 for i in range(4)]), 300/2, None, [], []) for T in line]
+trees = [rec_vertices(T, 375/2, rec_tree_paren(T, [i+1 for i in range(8)]), 300/2, None, [], []) for T in line]
 
-n = 4
+n = 6
 
 ##drawing methods
 ##draws the trees (i-1), i, (i+1) in a row (if they all exist)
@@ -59,7 +61,7 @@ def draw_tree(vt, ed, box):
 ##generate a "picture" of the tropical line
 ##n is the number of turning points
 def gen_line(n):
-	x_values = [i*2*math.pi/(n) for i in range(n)]
+	x_values = [i*2*math.pi/(n-1) for i in range(n)]
 	points = [(x*(625/(2*math.pi)) + 25, (math.sin(x) + 1.5)*100) for x in x_values]
 	return points
 
@@ -91,9 +93,9 @@ def draw_background(P):
 
 	if current != None:
 		##space for fine codim, coarse codim
-		text_surface_1 = font.render('fcd: ' + str(get_fine_codim(line[current[-1]])), True, (0, 0, 0))
+		text_surface_1 = font.render('fcd: ' + str(get_fine_codim(line[2*current[-1] + current[0]])), True, (0, 0, 0))
 		screen.blit(text_surface_1, dest=(400, 310))
-		text_surface_2 = font.render('ccd:', True, (0, 0, 0))
+		text_surface_2 = font.render('ccd:' + str(get_coarse_codim(line[2*current[-1] + current[0]])), True, (0, 0, 0))
 		screen.blit(text_surface_2, dest=(400, 335))
 
 		draw_trees(trees, 2*current[-1] + current[0])
@@ -215,7 +217,7 @@ while True:
 					##get the line between the two trees
 					u, v = examples
 					line = normalize_heights(get_line_int(u,v), 2)
-					trees = [rec_vertices(T, 375/2, rec_tree_paren(T, [i+1 for i in range(9)]), 300/2, None, [], []) for T in line]
+					trees = [rec_vertices(T, 375/2, rec_tree_paren(T, [i+1 for i in range(n)]), 300/2, None, [], []) for T in line]
 
 					##get points
 					P = gen_line(int((len(line) + 1)/2))

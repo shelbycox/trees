@@ -13,11 +13,12 @@ def normalize_heights(L, h):
 
 def get_tropical_line(u, v, recMu=False):
 	try:
-		mu = sorted([u[k] - v[k] for k in u.keys()])
+		mu = sorted(set([u[k] - v[k] for k in u.keys()]))
 
-		L = [u]
-		if recMu:
-			L = [(u, mu[0])]
+		L = []
+		# L = [u]
+		# if recMu:
+		# 	L = [(u, mu[0])]
 
 		for scalar in mu:
 			if recMu:
@@ -25,10 +26,10 @@ def get_tropical_line(u, v, recMu=False):
 			else:
 				L.append({k : max(scalar + v[k], u[k]) for k in u.keys()})
 
-		if recMu:
-			L.append((v, mu[-1]))
-		else:
-			L.append(v)
+		# if recMu:
+		# 	L.append((v, mu[-1]))
+		# else:
+		# 	L.append(v)
 
 		return L
 	
@@ -92,14 +93,16 @@ def reduce_line(L):
 
 def get_line_int(u,v):
 	##get the reduced tropical line from u to v
-	line = reduce_line(get_tropical_line(u,v,True))
+	line = get_tropical_line(u,v,True)
 	
 	mu = [line[0][1]]
 	for i in range(1,len(line)):
 		mu.append((line[i][1] + line[i-1][1])/2)
 		mu.append(line[i][1])
+
+	# print(mu)
 	
-	return [{k : max(m + u[k], v[k]) for k in u.keys()} for m in mu]
+	return [{k : max(u[k], m + v[k]) for k in u.keys()} for m in mu]
 
 def left_right_split(leaves, a):
 	left = [leaves[0]]
@@ -156,24 +159,41 @@ def print_path(u,v):
 
 def get_fine_codim(u):
 	l = len(argmaxm(u))
+	# print(u,argmaxm(u),l)
 	n_leaves = max([i for (i,j) in u.keys()])
 	return n_leaves - 1 - l
 
+##this DOES NOT comptue coarse codim
 def get_coarse_codim(u):
-	a = argmaxm(u)
-	fine_ties = 0
-	for t in a:
-		if not all_pairs(t):
-			fine_ties = fine_ties + 1
+	return get_num_coarse_ties(rec_tree_paren(u, list(set([i for (i,j) in u.keys()]))),0)
+	# a = argmaxm(u)
+	# fine_ties = 0
+	# for t in a:
+	# 	if not all_pairs(t):
+	# 		fine_ties = fine_ties + 1
 	
-	return get_fine_codim(u) - fine_ties
+	# return get_fine_codim(u) - fine_ties
 
-def all_pairs(L):
-	elts = list(set([i for (i,j) in L]))
+def get_num_coarse_ties(paren, count):
+	##if we're at the end of the paren
+	if type(paren) is int:
+		return count
+
+	elif len(paren) > 2:
+		count = count + len(paren) - 2
+
+	for b in paren:
+		count = get_num_coarse_ties(b, count)
+
+	return count
+
+
+def all_pairs(a):
+	elts = list(set([i for (i,j) in a]))
 	
 	for i in range(len(elts)):
 		for j in range(i+1, len(elts)):
-			if (i,j) not in L:
+			if (i,j) not in a:
 				return False
 	
 	return True

@@ -121,6 +121,8 @@ class TestGetLineInt(unittest.TestCase):
 
 class TestLeftRightSplit(unittest.TestCase):
 	##get some examples on around ~10 leaves where I know the answer
+	# def test_first_split(self):
+	# 	print(left_right_split([1,2,3], arg_1[0]))
 	pass
 
 class TestTreeRest(unittest.TestCase):
@@ -130,11 +132,13 @@ class TestTreeRest(unittest.TestCase):
 class TestRecTreeParen(unittest.TestCase):
 	##do some small cases that I know here
 	##no idea what else to do
-	pass
+	def test_small_examples(self):
+		print('rec test', rec_tree_paren(T3, [1,2,3,4]))
 
 class TestSplit(unittest.TestCase):
 	##do some small known examples
-	pass
+	def test_small_examples(self):
+		print('split test', split([1,2,3], arg_1[0]))
 
 class TestPrintPath(unittest.TestCase):
 	##no idea what to do here, do I need to test this?

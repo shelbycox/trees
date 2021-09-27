@@ -375,6 +375,26 @@ def find_lengths_int(ranks, T, d, u, l):
 		d = find_lengths_int(ranks,T,d,v,l-l1)
 		return find_lengths_int(ranks,T,d,w,l-l2)
 
+def get_external_edge(T,l):
+	'''given a leaf l,
+	return the pair (u,l), where u is the internal vertex adjacent to l
+	'''
+	for u in range(T[l]):
+		if T[l][u] != 0:
+			return (u,l)
+
+def make_equidistant(D,d):
+	new_d = d.copy()
+	new_D = D.copy()
+	h = get_dist(new_D,0,1,new_d)
+	for i in range(2,len(d)):
+		dist = get_dist(D,0,i,new_d)
+		u = get_external_edge(D,i)[0]
+		new_len = new_d[u][i] + h - dist
+		new_d[u][i], new_d[i][u] = new_len, new_len
+
+	return d
+
 ##given a metric tree D and two vertices, i and j, finds the distance between them
 ##make sure to pass in a COPY of D
 ##TESTED
@@ -470,11 +490,11 @@ def get_ranking(u, k):
 
 	return sorted(dist_to_root, key=dist_to_root.get)
 
-u = gen_tree(5)
+# u = gen_tree(5)
 # print(get_ranking(u, 16))
 # for i in range(9, 16):
 # 	print(i, get_dist(u.copy(), 0, i, 0))
-print(get_metric(u))
+# print(get_metric(u))
 # for d in get_metric(u).values():
 # 	print(type(d))
 # print(type(Decimal('.1111111')))

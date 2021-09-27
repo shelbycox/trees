@@ -12,7 +12,7 @@ class TestPruferToTree(unittest.TestCase):
 
 	trees = []
 	for t in [a,b,c,d]:
-		trees.append(build_tree(t))
+		trees.append(buildTree(t))
 
 	##TEST 1: just make sure the number of vertices is as expected
 	def testNumVert(self):
@@ -65,11 +65,11 @@ class TestPruferToTree(unittest.TestCase):
 
 ##checking that genTree actually generates a trivalent tree with the right number of vertices
 class randomTreeTest(unittest.TestCase):
-	R = gen_tri_tree(4, eq=False)
-	S = gen_tri_tree(6, eq=False)
-	T = gen_tri_tree(7, eq=False)
+	R = genTree(4, eq=False)
+	S = genTree(6, eq=False)
+	T = genTree(7, eq=False)
 
-	testTrees = [gen_tri_tree(i) for i in range(5,100)]
+	testTrees = [genTree(i) for i in range(5,100)]
 	leaves = [i for i in range(5,100)]
 	vert = [i - 2 for i in range(5,100)]
 
@@ -117,9 +117,9 @@ class randomTreeTest(unittest.TestCase):
 class TestEquidistant(unittest.TestCase):
 	start = 5
 	N = 50
-	testTrees = [gen_tri_tree(i, eq=False) for i in range(start,N)]
-	testEqTrees = [make_eq(tree) for tree in testTrees]
-	metrics = [get_metric(eq) for eq in testEqTrees]
+	testTrees = [genTree(i, eq=False) for i in range(start,N)]
+	testEqTrees = [makeEq(tree) for tree in testTrees]
+	metrics = [getMetric(eq) for eq in testEqTrees]
 
 	##tests to make sure edges are in the right places
 	def testEdges(self):
