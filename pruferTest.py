@@ -118,7 +118,7 @@ class TestEquidistant(unittest.TestCase):
 	start = 5
 	N = 50
 	testTrees = [gen_tree(i, eq=False) for i in range(start,N)]
-	testEqTrees = [make_eq(tree) for tree in testTrees]
+	testEqTrees = [make_equidistant(tree) for tree in testTrees]
 	metrics = [get_metric(eq) for eq in testEqTrees]
 
 	##tests to make sure edges are in the right places

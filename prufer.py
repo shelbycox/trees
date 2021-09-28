@@ -7,16 +7,20 @@ digits = 6
 count = 0
 
 class Tree():
-	def __init__(self, l, adj=None):
-		##records the adjacency matrix of the tree
+	def __init__(self, l, w_adj=None):
+		##record the number of leaves, vertices
 		self.l = l
 		self.leaves = [i for i in range(l)]
 		self.verts = [j for j in range(l+1, 2*l - 2)]
 
+		##record the weighted adjacency matrix
 		self.adj = adj.copy()
 		if self.adj is None:
 			self.adj = np.zeros((2*l - 2, 2*l - 2))
-			##THEN GENERATE A RANDOM TREE HERE!!!
+
+		##record the adjacency matrix (unweighted)
+
+		##record the metric on leaves
 
 	def gen_tree(self):
 		'''generates a tree randomly if only the number of leaves is provided
@@ -151,11 +155,15 @@ def gen_tree(l, eq=True):
 
 	T = build_tree(a)
 
-	if eq:
-		T = make_eq(T)
-		return make_eq(T,True)
+	##find the internal node connected to 0
+	u = T[0].tolist().index(1)
+	T[0][u] = T[u][0] = 0
 
-	return T
+	d = find_lengths(T.copy(), np.zeros((n,n)), u, 100)
+
+	d[0][u] = d[u][0] = int(1)
+
+	return make_equidistant(T,d)
 
 ##TESTED
 def find_lengths(T,d,u,cap):
@@ -274,12 +282,7 @@ def make_eq(T, use_int=False):
 			T_copy[u][0] = 0
 			break
 
-	if use_int == False:
-		d = find_lengths(T_copy,d,u,1)
-
-	else:
-		r = get_ranking(T,n)
-		d = find_lengths_int(r,T_copy,d,u,len(r))
+	d = find_lengths(T_copy,d,u,100)
 
 	##add back the edges to 0
 	d[0][u] = int(1)
@@ -346,7 +349,7 @@ def find_lengths_int(ranks, T, d, u, l):
 
 		##and recurse to find the lengths from the other node
 		#print('recursing')
-		return find_lengths_int(ranks,T,d,w,l - lr)
+		return find_lengths_int(ranks,T,d,w,cap)
 
 	elif deg_v == 3 and deg_w == 1:
 		##w is the leaf, v is the internal node
@@ -386,7 +389,7 @@ def get_external_edge(T,l):
 		if T[l][u] != 0:
 			return (u,l)
 
-def make_equidistant(D,d):
+def make_equidistant(D, d):
 	new_d = d.copy()
 	new_D = D.copy()
 	h = get_dist(new_D,0,1,new_d)
@@ -493,7 +496,7 @@ def get_ranking(u, k):
 
 	return sorted(dist_to_root, key=dist_to_root.get)
 
-# u = gen_tree(5)
+u = gen_tree(5)
 # print(get_ranking(u, 16))
 # for i in range(9, 16):
 # 	print(i, get_dist(u.copy(), 0, i, 0))
