@@ -158,7 +158,7 @@ def gen_tree(l, eq=True):
 	return T
 
 ##TESTED
-def find_lengths(T,d,u,l):
+def find_lengths(T,d,u,cap):
 	##if T is the zero matrix we're done, so return the distances
 	if np.count_nonzero(T) == 0:
 		#print('T is zero! ', d)
@@ -193,6 +193,7 @@ def find_lengths(T,d,u,l):
 	if deg_v == 1 and deg_w == 1:
 		##set the lengths to the two leaves
 		#print('in first case')
+		l = np.random.randint(1,cap)
 		d[u][v] = l
 		d[v][u] = l
 		d[u][w] = l
@@ -204,12 +205,13 @@ def find_lengths(T,d,u,l):
 		##v is the leaf, w is the internal node
 		##set the length to the leaf
 		#print('set length to v')
+		l = np.random.randint(cap)
 		d[u][v] = l
 		d[v][u] = l
 
 		##set the length from u to w to be a random number less than l
 		#print('set length to w')
-		lr = np.random.uniform(0,l)
+		lr = np.random.randint(cap)
 		d[u][w] = lr
 		d[w][u] = lr
 
@@ -217,37 +219,38 @@ def find_lengths(T,d,u,l):
 
 		##and recurse to find the lengths from the other node
 		#print('recursing')
-		return find_lengths(T,d,w,l - lr)
+		return find_lengths(T,d,w,cap)
 
 	elif deg_v == 3 and deg_w == 1:
 		##w is the leaf, v is the internal node
 		##set the length to the leaf
+		l = random.randint(cap)
 		d[u][w] = l
 		d[w][u] = l
 
 		##set the length from u to v to be a random number less than l
-		lr = np.random.uniform(0,l)
+		lr = np.random.randint(cap)
 		d[u][v] = lr
 		d[v][u] = lr
 
 		##and recurse to find the lengths from the other node
-		return find_lengths(T,d,v,l-lr)
+		return find_lengths(T,d,v,cap)
 	
 	##case 3: both nodes are internal
 	elif deg_v == 3 and deg_w == 3:
 		##set the length to v
-		l1 = np.random.uniform(0,l)
+		l1 = np.random.randint(0,cap)
 		d[u][v] = l1
 		d[v][u] = l1
 
 		##set the length to w
-		l2 = np.random.uniform(0,l)
+		l2 = np.random.randint(0,cap)
 		d[u][w] = l2
 		d[w][u] = l2
 
 		##recurse
-		d = find_lengths(T,d,v,l-l1)
-		return find_lengths(T,d,w,l-l2)
+		d = find_lengths(T,d,v,cap)
+		return find_lengths(T,d,w,cap)
 
 ##make the trees equidistant
 ##takes 0 to be the root always
