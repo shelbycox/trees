@@ -385,7 +385,7 @@ def get_external_edge(T,l):
 	'''given a leaf l,
 	return the pair (u,l), where u is the internal vertex adjacent to l
 	'''
-	for u in range(T[l]):
+	for u in range(len(T[l])):
 		if T[l][u] != 0:
 			return (u,l)
 
@@ -394,7 +394,7 @@ def make_equidistant(D, d):
 	new_D = D.copy()
 	h = get_dist(new_D,0,1,new_d)
 	for i in range(2,len(d)):
-		dist = get_dist(D,0,i,new_d)
+		dist = get_dist(D.copy(),0,i,new_d)
 		u = get_external_edge(D,i)[0]
 		new_len = new_d[u][i] + h - dist
 		new_d[u][i], new_d[i][u] = new_len, new_len
@@ -428,12 +428,14 @@ def get_dist(D,i,j,d):
 	##otherwise, recurse to find a path to j
 	##store the distances temporarily
 	temp_dist = D[i].copy()
+	print(D[i][0])
 	##remove the edges we just used
 	for k in adjacent:
 		D[i][k] = 0
 		D[k][i] = 0
 		#print('the new distance is:', d + temp_dist[k])
 
+	print([get_dist(D,k,j,d+temp_dist[k]) for k in adjacent])
 	return max([get_dist(D,k,j, d + temp_dist[k]) for k in adjacent])
 
 ##given a trivalent tree with edges labelled with lengths, return the tree metric as a vector
@@ -497,6 +499,8 @@ def get_ranking(u, k):
 	return sorted(dist_to_root, key=dist_to_root.get)
 
 u = gen_tree(5)
+
+print(get_metric(u))
 # print(get_ranking(u, 16))
 # for i in range(9, 16):
 # 	print(i, get_dist(u.copy(), 0, i, 0))
