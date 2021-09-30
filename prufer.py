@@ -163,7 +163,7 @@ def gen_tree(l, eq=True):
 
 	d[0][u] = d[u][0] = int(1)
 
-	return make_equidistant(T,d)
+	return make_equidistant(d)
 
 ##TESTED
 def find_lengths(T,d,u,cap):
@@ -213,13 +213,13 @@ def find_lengths(T,d,u,cap):
 		##v is the leaf, w is the internal node
 		##set the length to the leaf
 		#print('set length to v')
-		l = np.random.randint(cap)
+		l = np.random.randint(1,cap)
 		d[u][v] = l
 		d[v][u] = l
 
 		##set the length from u to w to be a random number less than l
 		#print('set length to w')
-		lr = np.random.randint(cap)
+		lr = np.random.randint(1,cap)
 		d[u][w] = lr
 		d[w][u] = lr
 
@@ -232,12 +232,12 @@ def find_lengths(T,d,u,cap):
 	elif deg_v == 3 and deg_w == 1:
 		##w is the leaf, v is the internal node
 		##set the length to the leaf
-		l = random.randint(cap)
+		l = random.randint(1,cap)
 		d[u][w] = l
 		d[w][u] = l
 
 		##set the length from u to v to be a random number less than l
-		lr = np.random.randint(cap)
+		lr = np.random.randint(1,cap)
 		d[u][v] = lr
 		d[v][u] = lr
 
@@ -247,12 +247,12 @@ def find_lengths(T,d,u,cap):
 	##case 3: both nodes are internal
 	elif deg_v == 3 and deg_w == 3:
 		##set the length to v
-		l1 = np.random.randint(0,cap)
+		l1 = np.random.randint(1,cap)
 		d[u][v] = l1
 		d[v][u] = l1
 
 		##set the length to w
-		l2 = np.random.randint(0,cap)
+		l2 = np.random.randint(1,cap)
 		d[u][w] = l2
 		d[w][u] = l2
 
@@ -389,17 +389,44 @@ def get_external_edge(T,l):
 		if T[l][u] != 0:
 			return (u,l)
 
-def make_equidistant(D, d):
-	new_d = d.copy()
+def make_equidistant(D):
+	##all vertices
+	n = len(D)
+	##num leaves
+	l = int((n+2)/2)
 	new_D = D.copy()
-	h = get_dist(new_D,0,1,new_d)
-	for i in range(2,len(d)):
-		dist = get_dist(D.copy(),0,i,new_d)
-		u = get_external_edge(D,i)[0]
-		new_len = new_d[u][i] + h - dist
-		new_d[u][i], new_d[i][u] = new_len, new_len
+	# print(D)
 
-	return d
+	##get the tallest height
+	h = get_dist(D.copy(), 0, 1, 0)
+	j = 1
+	for i in range(2,l):
+		d = get_dist(D.copy(), 0, i, 0)
+		if d > h:
+			h = d
+			j = i
+
+	# print('h:', h)
+
+	##loop through all leaves
+	for i in range(l):
+		if i != j:
+			##get the current distance from 0 to leaf i
+			dist = get_dist(D.copy(),0,i,0)
+			# print('dist:', dist)
+			# print(D.shape)
+			##get the internal vertex attached to i
+			u = np.nonzero(D[i])[0][0]
+			##adjust the length of the edge from u to i
+			##so that the distance from 0 to i is h
+			# print(u, i)
+			new_len = D[u][i] + h - dist
+			# print('new_len:', new_len)
+			new_D[u][i] = new_D[i][u] = new_len
+			# print(new_D)
+	# print(D)
+	# print(new_D)
+	return new_D
 
 ##given a metric tree D and two vertices, i and j, finds the distance between them
 ##make sure to pass in a COPY of D
@@ -428,14 +455,14 @@ def get_dist(D,i,j,d):
 	##otherwise, recurse to find a path to j
 	##store the distances temporarily
 	temp_dist = D[i].copy()
-	print(D[i][0])
+	# print(D[i][0])
 	##remove the edges we just used
 	for k in adjacent:
 		D[i][k] = 0
 		D[k][i] = 0
 		#print('the new distance is:', d + temp_dist[k])
 
-	print([get_dist(D,k,j,d+temp_dist[k]) for k in adjacent])
+	# print([get_dist(D,k,j,d+temp_dist[k]) for k in adjacent])
 	return max([get_dist(D,k,j, d + temp_dist[k]) for k in adjacent])
 
 ##given a trivalent tree with edges labelled with lengths, return the tree metric as a vector
@@ -498,7 +525,10 @@ def get_ranking(u, k):
 
 	return sorted(dist_to_root, key=dist_to_root.get)
 
-u = gen_tree(5)
+u = gen_tree(10)
+for i in range(100):
+	u = gen_tree(10)
+	v = gen_tree(11)
 
 print(get_metric(u))
 # print(get_ranking(u, 16))
