@@ -525,6 +525,18 @@ def get_ranking(u, k):
 
 	return sorted(dist_to_root, key=dist_to_root.get)
 
+def rand_pair(n):
+	'''generates a random pair of trees on n leaves
+	returned as a metric on the (non-zero) leaves
+	'''
+	T = gen_tree(n+1)
+	R = gen_tree(n+1)
+
+	m = get_metric(T)
+	n = get_metric(R)
+
+	return {(i,j) : m[(i,j)] for (i,j) in m.keys() if i != 0 and j != 0}, {(i,j) : n[(i,j)] for (i,j) in n.keys() if i != 0 and j != 0}
+
 u = gen_tree(10)
 for i in range(100):
 	u = gen_tree(10)

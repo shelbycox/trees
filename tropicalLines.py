@@ -13,23 +13,18 @@ def normalize_heights(L, h):
 
 def get_tropical_line(u, v, recMu=False):
 	try:
+		##get the list of scalars to add to v
 		mu = sorted(set([u[k] - v[k] for k in u.keys()]))
 
 		L = []
-		# L = [u]
-		# if recMu:
-		# 	L = [(u, mu[0])]
 
 		for scalar in mu:
 			if recMu:
+				##if we want to record the scalars, add the tree and the scalar to the list
 				L.append(({k : max(scalar + v[k], u[k]) for k in u.keys()}, scalar))
 			else:
+				##otherwise, just add the tree to the list
 				L.append({k : max(scalar + v[k], u[k]) for k in u.keys()})
-
-		# if recMu:
-		# 	L.append((v, mu[-1]))
-		# else:
-		# 	L.append(v)
 
 		return L
 	
