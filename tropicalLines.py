@@ -195,3 +195,145 @@ def all_pairs(a):
 
 def get_heights(u):
 	return sorted(set([h for h in u.values()]))
+
+def tree_to_dict(u, n):
+	##given a vector, get a dict
+	u_dict = dict()
+	i = 1
+	j = 2
+	for dex in u:
+		u_dict[(i,j)] = dex
+		u_dict[(j,i)] = dex
+		if j < n:
+			j = j + 1
+		else:
+			i = i + 1
+			j = i + 1
+
+	return u_dict
+
+def compare_coarse(u,v,n):
+	##returns true if u,v have the same coarse structure
+	##false otherwise
+
+	##idea: prufer sequences will tell me if the trees have the same coarse structure
+	##so reconstruct the prufer sequence
+	p = get_prufer(u,n)
+	q = get_prufer(v,n)
+	return p == q
+
+def reduce_coarse(line):
+	for i in range(len(line) - 1):
+		if compare_coarse(line[i], line[i+1]):
+			line.pop(i+1)
+			i = i - 1
+
+
+def nni_distance(u,v):
+	line = reduce_line(get_tropical_line(u,v))
+	count = 0
+	for T in line:
+		count = count + contribution(T)
+	return count
+
+##what about when we stay in codimension 1 or 2 for a while?
+##need to properly reduce the line!
+
+def contribution(u):
+	C = 2
+	R = rec_tree_paren(u)
+	indices = [[i] for i in range(len(R))]
+	stopper = 0
+	if len(indices > C):
+		C = len(indices)
+	while stopper < 100:
+		stopper = stopper + 1
+		for I in indices:
+			curr = R
+			for i in I:
+				curr = curr[i]
+			if len(curr) > C:
+				C = len(curr)
+
+	##if there is a node with three children
+	if C == 3:
+		##then the tree represents one NNI
+		return 1
+	##if there is a tree with four children
+	if C == 4:
+		##then the tree represents two NNIs
+		return 2
+	##note that generically, there will be exactly one node with more than 2 children, 
+	## and it will have at most four children
+	return 0
+
+
+## could I recover the prufer sequence from the metric instead?
+## get argmaxm
+## name the top vertex j
+## save the left and right vertices of j
+def get_adj(u, num_leaves):
+	A = argmaxm(u)
+	num_verts = 2*num_leaves - 1
+	j = num_leaves + 1
+	children = dict()
+	adj = np.zeros((num_verts, num_verts))
+
+	##connect internal vertices
+	for a in A:
+		ties = get_ties(a)
+		print('ties', ties)
+		for v in range(len(ties)):
+			print(j + v)
+			children[j + v] = ties[v]
+			for k in range(num_leaves + 1, j)[::1]:
+				if set(children[j + v]).issubset(set(children[k])):
+					adj[k-1][j-1] = adj[j-1][k-1] = 1
+		j = j + v + 1
+
+	##connect leaves
+	##loop through leaves
+	##go in reverse order through children
+	##
+	for i in range(num_leaves):
+		for k in range(num_leaves + 1, j)[::-1]:
+			if i+1 in children[k]:
+				adj[k-1][i] = adj[i][k-1] = 1
+				break
+
+	return adj
+
+def get_ties(a):
+	leaves = list(set([i for (i,j) in a]))
+	ties = {j : j for j in leaves}
+	for (i,j) in a:
+		m = min(ties[i], ties[j])
+		ties[i] = ties[j] = m
+
+	return [[i for i in leaves if ties[i] == j] for j in list(set(ties.values()))]
+
+def get_prufer(T):
+	P = []
+	u = 0
+	while u < len(T):
+		##if i is a leaf
+		if np.count_nonzero(T[u]) == 1:
+			##find the vertex adjacent to i
+			v = -1
+			for i in range(len(T)):
+				if T[u][i] != 0:
+					v = i
+					break
+
+			##add it to the Prufer sequence
+			P.append(v)
+
+			##remove the edges from i to v
+			T[u][v] = 0
+			T[v][u] = 0
+
+			##reset u to the start of the list
+			u = 0
+		else:
+			u = u + 1
+	return P
