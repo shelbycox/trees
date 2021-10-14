@@ -272,6 +272,7 @@ def get_adj(u, num_leaves):
 	##connect internal vertices
 	for a in A:
 		ties = get_ties(a)
+		print(ties)
 		# print('ties', ties)
 		for v in range(len(ties)):
 			# print(j + v)
@@ -279,6 +280,8 @@ def get_adj(u, num_leaves):
 			for k in range(num_leaves + 1, j)[::1]:
 				if set(children[j + v]).issubset(set(children[k])):
 					adj[k-1][j-1] = adj[j-1][k-1] = 1
+					##only do this once!
+					break
 		j = j + v + 1
 
 	##connect leaves
