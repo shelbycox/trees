@@ -1,4 +1,5 @@
 import operator
+import numpy as np
 
 error = 0
 
@@ -218,33 +219,40 @@ def compare_coarse(u,v,n):
 
 	##idea: prufer sequences will tell me if the trees have the same coarse structure
 	##so reconstruct the prufer sequence
-	p = get_prufer(u,n)
-	q = get_prufer(v,n)
+	p = get_prufer(get_adj(u,n))
+	q = get_prufer(get_adj(v,n))
 	return p == q
 
-def reduce_coarse(line):
-	for i in range(len(line) - 1):
-		if compare_coarse(line[i], line[i+1]):
-			line.pop(i+1)
-			i = i - 1
+def reduce_coarse(line,n):
+	new_line = line.copy()
+	i = 0
+	while True:
+		if i >= len(new_line) - 1:
+			break
+		if compare_coarse(new_line[i], new_line[i+1], n):
+			new_line.pop(i+1)
+		else:
+			i = i + 1
+
+	return new_line
 
 
-def nni_distance(u,v):
-	line = reduce_line(get_tropical_line(u,v))
+def nni_distance(u,v,n):
+	line = reduce_coarse(get_tropical_line(u,v),n)
 	count = 0
 	for T in line:
-		count = count + contribution(T)
+		count = count + contribution(T,n)
 	return count
 
 ##what about when we stay in codimension 1 or 2 for a while?
 ##need to properly reduce the line!
 
-def contribution(u):
+def contribution(u,n):
 	C = 2
-	R = rec_tree_paren(u)
+	R = rec_tree_paren(u, [i+1 for i in range(n)])
 	indices = [[i] for i in range(len(R))]
 	stopper = 0
-	if len(indices > C):
+	if len(indices) > C:
 		C = len(indices)
 	while stopper < 100:
 		stopper = stopper + 1
@@ -282,9 +290,9 @@ def get_adj(u, num_leaves):
 	##connect internal vertices
 	for a in A:
 		ties = get_ties(a)
-		print('ties', ties)
+		# print('ties', ties)
 		for v in range(len(ties)):
-			print(j + v)
+			# print(j + v)
 			children[j + v] = ties[v]
 			for k in range(num_leaves + 1, j)[::1]:
 				if set(children[j + v]).issubset(set(children[k])):
@@ -314,7 +322,7 @@ def get_ties(a):
 
 def get_prufer(T):
 	P = []
-	u = 0
+	u = 1
 	while u < len(T):
 		##if i is a leaf
 		if np.count_nonzero(T[u]) == 1:

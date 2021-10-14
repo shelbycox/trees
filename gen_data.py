@@ -17,7 +17,7 @@ def tree_to_dict(u, n):
 
 	return u_dict
 
-def get_data(u,v):
+def get_data(u,v,n):
 	##get n choose 2, the maximum length of the tropical line
 	max_length = int(len(u)/2)
 
@@ -26,15 +26,20 @@ def get_data(u,v):
 	actual_lambda_len = len(line)
 
 	##get the actual NNI length
-	red_line = tl.reduce_line(line)
-	actual_NNI_len = len(red_line)
+	actual_NNI_len = tl.nni_distance(u,v,n)
 
 	return max_length, actual_lambda_len, actual_NNI_len
 
-def gen_data(N,num_leaves):
-	for i in N:
-		##get two trees
-		##get the data above
-		##record it in a csv file
+def gen_data(N, num_leaves):
+	for k in range(N):
+		T = pf.get_metric(pf.gen_tree(num_leaves+1))
+		u = {(i,j) : T[(i,j)] for (i,j) in T.keys() if i != 0 and j != 0}
+
+		R = pf.get_metric(pf.gen_tree(num_leaves+1))
+		v = {(i,j) : R[(i,j)] for (i,j) in R.keys() if i != 0 and j != 0}
+
+		print(get_data(u,v,num_leaves))
+
+gen_data(10,5)
 
 ##then print averages and stuff, compare to n^2, n log n, n

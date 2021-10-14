@@ -537,12 +537,12 @@ def rand_pair(n):
 
 	return {(i,j) : m[(i,j)] for (i,j) in m.keys() if i != 0 and j != 0}, {(i,j) : n[(i,j)] for (i,j) in n.keys() if i != 0 and j != 0}
 
-u = gen_tree(10)
-for i in range(100):
-	u = gen_tree(10)
-	v = gen_tree(11)
+# u = gen_tree(10)
+# for i in range(100):
+# 	u = gen_tree(10)
+# 	v = gen_tree(11)
 
-print(get_metric(u))
+# print(get_metric(u))
 # print(get_ranking(u, 16))
 # for i in range(9, 16):
 # 	print(i, get_dist(u.copy(), 0, i, 0))

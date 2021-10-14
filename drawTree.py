@@ -114,6 +114,9 @@ def rec_vertices(u, center_x, structure, radius, prev, verts, edges):
 
 	return verts, edges
 
+import sys
+print(sys.executable)
+
 # import networkx as nx
 # import matplotlib.pyplot as plt
 
