@@ -272,24 +272,27 @@ def get_adj(u, num_leaves):
 	##connect internal vertices
 	for a in A:
 		ties = get_ties(a)
-		print(ties)
 		# print('ties', ties)
 		for v in range(len(ties)):
 			# print(j + v)
 			children[j + v] = ties[v]
-			for k in range(num_leaves + 1, j)[::1]:
+			for k in list(range(num_leaves + 1, j))[::-1]:
+				# print(k)
 				if set(children[j + v]).issubset(set(children[k])):
+					print('attaching', j+v, k)
 					adj[k-1][j-1] = adj[j-1][k-1] = 1
 					##only do this once!
 					break
 		j = j + v + 1
+
+	print(children)
 
 	##connect leaves
 	##loop through leaves
 	##go in reverse order through children
 	##I'm not adding too many leaf connections...
 	for i in range(num_leaves):
-		for k in range(num_leaves + 1, j)[::-1]:
+		for k in list(range(num_leaves + 1, j))[::-1]:
 				if i+1 in children[k]:
 					adj[k-1][i] = adj[i][k-1] = 1
 					break
@@ -331,4 +334,4 @@ def get_prufer(T_x):
 			u = 0
 		else:
 			u = u + 1
-	return P
+	return [p + 1 for p in P]
