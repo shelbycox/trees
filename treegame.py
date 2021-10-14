@@ -97,6 +97,8 @@ def draw_background(P):
 		screen.blit(text_surface_1, dest=(400, 310))
 		text_surface_2 = font.render('ccd:' + str(get_coarse_codim(line[2*current[-1] + current[0]])), True, (0, 0, 0))
 		screen.blit(text_surface_2, dest=(400, 335))
+		text_contribution = font.render('cont: ' + str(contribution(line[2*current[-1] + current[0]],n)), True, (0, 0, 0))
+		screen.blit(text_contribution, dest=(400, 360))
 
 		draw_trees(trees, 2*current[-1] + current[0])
 
@@ -120,6 +122,9 @@ def draw_background(P):
 	pygame.draw.rect(screen, pink, load_button)
 	load_button_text = font.render('load', True, (0,0,0))
 	screen.blit(load_button_text, dest=(735, 40))
+
+	text_nni_dist = font.render('NNI distance: ' + str(nni_distance(u,v,n)), True, (0, 0, 0))
+	screen.blit(text_nni_dist, dest=(735, 265))
 
 ##color names
 red = (255,0,0)

@@ -248,33 +248,15 @@ def nni_distance(u,v,n):
 ##need to properly reduce the line!
 
 def contribution(u,n):
-	C = 2
-	R = rec_tree_paren(u, [i+1 for i in range(n)])
-	indices = [[i] for i in range(len(R))]
-	stopper = 0
-	if len(indices) > C:
-		C = len(indices)
-	while stopper < 100:
-		stopper = stopper + 1
-		for I in indices:
-			curr = R
-			for i in I:
-				curr = curr[i]
-			if len(curr) > C:
-				C = len(curr)
+	C = 0
+	P = get_prufer(get_adj(u,n))
+	internal_vertices = list(set(P))
+	for v in internal_vertices:
+		c = P.count(v)
+		if c > 3:
+			C = C + (c - 3)
 
-	##if there is a node with three children
-	if C == 3:
-		##then the tree represents one NNI
-		return 1
-	##if there is a tree with four children
-	if C == 4:
-		##then the tree represents two NNIs
-		return 2
-	##note that generically, there will be exactly one node with more than 2 children, 
-	## and it will have at most four children
-	return 0
-
+	return C
 
 ## could I recover the prufer sequence from the metric instead?
 ## get argmaxm
@@ -302,12 +284,12 @@ def get_adj(u, num_leaves):
 	##connect leaves
 	##loop through leaves
 	##go in reverse order through children
-	##
+	##I'm not adding too many leaf connections...
 	for i in range(num_leaves):
 		for k in range(num_leaves + 1, j)[::-1]:
-			if i+1 in children[k]:
-				adj[k-1][i] = adj[i][k-1] = 1
-				break
+				if i+1 in children[k]:
+					adj[k-1][i] = adj[i][k-1] = 1
+					break
 
 	return adj
 
@@ -320,10 +302,12 @@ def get_ties(a):
 
 	return [[i for i in leaves if ties[i] == j] for j in list(set(ties.values()))]
 
-def get_prufer(T):
+def get_prufer(T_x):
+	T = T_x.copy()
 	P = []
-	u = 1
+	u = 0
 	while u < len(T):
+		# print(u)
 		##if i is a leaf
 		if np.count_nonzero(T[u]) == 1:
 			##find the vertex adjacent to i
