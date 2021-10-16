@@ -249,12 +249,17 @@ def nni_distance(u,v,n):
 
 def contribution(u,n):
 	C = 0
-	P = get_prufer(get_adj(u,n))
+	P = get_prufer(get_adj(u,n))[:-1]
 	internal_vertices = list(set(P))
 	for v in internal_vertices:
 		c = P.count(v)
-		if c > 3:
-			C = C + (c - 3)
+		# print(v, 'appears', c, 'times')
+		if v == n + 1:
+			if c > 1:
+				C = C + (c - 1)
+		else:
+			if c > 2:
+				C = C + (c - 2)
 
 	return C
 
@@ -279,13 +284,13 @@ def get_adj(u, num_leaves):
 			for k in list(range(num_leaves + 1, j))[::-1]:
 				# print(k)
 				if set(children[j + v]).issubset(set(children[k])):
-					print('attaching', j+v, k)
+					# print('attaching', j+v, k)
 					adj[k-1][j-1] = adj[j-1][k-1] = 1
 					##only do this once!
 					break
 		j = j + v + 1
 
-	print(children)
+	# print(children)
 
 	##connect leaves
 	##loop through leaves

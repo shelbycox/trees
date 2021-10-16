@@ -100,6 +100,10 @@ def draw_background(P):
 		text_contribution = font.render('cont: ' + str(contribution(line[2*current[-1] + current[0]],n)), True, (0, 0, 0))
 		screen.blit(text_contribution, dest=(400, 360))
 
+		##write the prufer sequence under the middle tree
+		text_prufer = font.render(str(get_prufer(get_adj(line[2*current[-1] + current[0]], n))), True, (0, 0, 0))
+		screen.blit(text_prufer, dest=(400, 585))
+
 		draw_trees(trees, 2*current[-1] + current[0])
 
 		if current[0] == 0:
@@ -123,6 +127,7 @@ def draw_background(P):
 	load_button_text = font.render('load', True, (0,0,0))
 	screen.blit(load_button_text, dest=(735, 40))
 
+	##write the NNI distance
 	text_nni_dist = font.render('NNI distance: ' + str(nni_distance(u,v,n)), True, (0, 0, 0))
 	screen.blit(text_nni_dist, dest=(735, 265))
 
