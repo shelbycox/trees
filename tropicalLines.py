@@ -271,35 +271,44 @@ def get_adj(u, num_leaves):
 	A = argmaxm(u)
 	num_verts = 2*num_leaves - 1
 	j = num_leaves + 1
+
+	##children will store the descendants of internal nodes
 	children = dict()
+
+	##adj will store the adjacency matrix of u
 	adj = np.zeros((num_verts, num_verts))
 
-	##connect internal vertices
+	##consider adding a 0 leaf
+
+	##STEP 1: connect internal vertices
+	##loop through heights of internal vertices
 	for a in A:
+		##get the distinct internal vertices that share the same height h
 		ties = get_ties(a)
 		# print('ties', ties)
+		##get the children of each internal vertex at height h
 		for v in range(len(ties)):
-			# print(j + v)
 			children[j + v] = ties[v]
+			# print('finding parent of', j+v)
+
+			##now find the parent of the current internal vertex j+v
 			for k in list(range(num_leaves + 1, j))[::-1]:
-				# print(k)
+				##it will be the last internal vertex added whose descendants contain j+v's descendants
 				if set(children[j + v]).issubset(set(children[k])):
 					# print('attaching', j+v, k)
-					adj[k-1][j-1] = adj[j-1][k-1] = 1
-					##only do this once!
+					adj[k-1][j+v-1] = adj[j+v-1][k-1] = 1
+					##each internal vertex has exactly one parent
 					break
 		j = j + v + 1
 
-	# print(children)
-
-	##connect leaves
+	##STEP 2: connect leaves to internal vertices
 	##loop through leaves
-	##go in reverse order through children
-	##I'm not adding too many leaf connections...
 	for i in range(num_leaves):
+		##find the last internal vertex added with i+1 as a descendant
 		for k in list(range(num_leaves + 1, j))[::-1]:
 				if i+1 in children[k]:
 					adj[k-1][i] = adj[i][k-1] = 1
+					##i+1 is the child of exactly one internal vertex
 					break
 
 	return adj
