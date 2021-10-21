@@ -1,5 +1,7 @@
 import tropicalLines as tl
 import prufer as pf
+import math
+# import matplotlib as plt
 
 def tree_to_dict(u, n):
 	##given a vector, get a dict
@@ -28,7 +30,7 @@ def get_data(u,v,n):
 	##get the actual NNI length
 	actual_NNI_len = tl.nni_distance(u,v,n)
 
-	return max_length, round(actual_lambda_len/max_length, 6), round(actual_NNI_len/max_length, 6)
+	return max_length, round(actual_lambda_len/max_length, 6), round(actual_NNI_len/max_length, 6), actual_NNI_len
 
 def gen_data(N, num_leaves):
 	data = []
@@ -43,9 +45,24 @@ def gen_data(N, num_leaves):
 
 	return data
 
-D = gen_data(100,15)
-print(D)
-avg = sum([v[1] for v in D])/len(D)
-print(avg)
+def avg(N, num_leaves):
+	D = gen_data(N, num_leaves)
+	nni_lengths = [v[-1] for v in D]
+	b = sum([l for l in nni_lengths])
+	return b/N
+
+# guess = 20*math.log(20)
+# D = gen_data(100,20)
+# print(D)
+# avg = sum([v[1] for v in D])/len(D)
+# print(avg)
+
+# fig, ax = plt.subplots()  # Create a figure containing a single axes.
+# ax.plot([i for i in range(4, 20)], [avg(100, i) for i in range(4,20)])  # Plot some data on the axes.
+
+for i in range(4, 20):
+	a = avg(100, i)
+	guess = i*math.log2(i)
+	print(i, a, guess, a/guess)
 
 ##then print averages and stuff, compare to n^2, n log n, n
