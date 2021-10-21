@@ -1,7 +1,7 @@
 import tropicalLines as tl
 import prufer as pf
 import math
-# import matplotlib as plt
+import matplotlib.pyplot as plt
 
 def tree_to_dict(u, n):
 	##given a vector, get a dict
@@ -57,12 +57,14 @@ def avg(N, num_leaves):
 # avg = sum([v[1] for v in D])/len(D)
 # print(avg)
 
-# fig, ax = plt.subplots()  # Create a figure containing a single axes.
-# ax.plot([i for i in range(4, 20)], [avg(100, i) for i in range(4,20)])  # Plot some data on the axes.
+fig, ax = plt.subplots()  # Create a figure containing a single axes.
+ax.plot([i for i in range(4, 20)], [avg(100, i) for i in range(4,20)])  # Plot some data on the axes.
+ax.plot([i for i in range(4, 20)], [i*math.log(i) for i in range(4,20)])
+plt.show()
 
-for i in range(4, 20):
-	a = avg(100, i)
-	guess = i*math.log2(i)
-	print(i, a, guess, a/guess)
+# for i in range(4, 20):
+# 	a = avg(100, i)
+# 	guess = i*math.log2(i)
+# 	print(i, a, guess, a/guess)
 
 ##then print averages and stuff, compare to n^2, n log n, n
