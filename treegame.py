@@ -19,10 +19,21 @@ from mouseover import *
 # print(rec_tree_paren(u, [i+1 for i in range(6)]))
 # print(rec_tree_paren(v, [i+1 for i in range(6)]))
 
-u = 
-v = 
+a = 3
+q = 2
+b = 3
+c = 5
+
+u = {(1, 2): a, (2, 1): a, (1, 3): 10, (3, 1): 10, (1, 4): 10, (4, 1): 10, (2, 3): 10, (3, 2): 10, (2, 4): 10, (4, 2): 10, (3, 4): q, (4, 3): q}
+v = {(1, 2): b, (2, 1): b, (1, 3): b+c, (3, 1): b+c, (1, 4): 10, (4, 1): 10, (2, 3): b+c, (3, 2): b+c, (2, 4): 10, (4, 2): 10, (3, 4): 10, (4, 3): 10}
 
 line = normalize_heights(get_line_int(u,v), 2)
+for l in line:
+	print(l)
+
+for i in range(1,4):
+	for j in range(i+1,5):
+		print(u[(i,j)] - v[(i,j)])
 
 trees = [rec_vertices(T, 375/2, rec_tree_paren(T, [i+1 for i in range(4)]), 300/2, None, [], []) for T in line]
 
@@ -106,6 +117,10 @@ def draw_background(P):
 		##write the prufer sequence under the middle tree
 		text_prufer = font.render(str(get_prufer(get_adj(line[2*current[-1] + current[0]], n))), True, (0, 0, 0))
 		screen.blit(text_prufer, dest=(400, 585))
+
+		##write the lambda coefficient under the middle tree
+		# text_lambda = font.render(str(line[2*current[-1] + current[0]][-1]), True, (0,0,0))
+		# screen.blit(text_lambda, dest=(450, 585))
 
 		draw_trees(trees, 2*current[-1] + current[0])
 
