@@ -51,16 +51,47 @@ def avg(N, num_leaves):
 	b = sum([l for l in nni_lengths])
 	return b/N
 
+def get_lambda_data(u, v, n):
+	##get n choose 2, the maximum length of the tropical line
+	max_length = int(len(u)/2)
+
+	##get the actual length of lambda as a set
+	actual_lambda_len = len(list(set([u[k] - v[k] for k in u.keys()])))
+
+	return max_length, actual_lambda_len, round(actual_lambda_len/max_length, 6)
+
+def gen_lambda_data(N, num_leaves):
+	data = []
+	for k in range(N):
+		T = pf.get_metric(pf.gen_tree(num_leaves+1))
+		u = {(i,j) : T[(i,j)] for (i,j) in T.keys() if i != 0 and j != 0}
+
+		R = pf.get_metric(pf.gen_tree(num_leaves+1))
+		v = {(i,j) : R[(i,j)] for (i,j) in R.keys() if i != 0 and j != 0}
+
+		data.append(get_lambda_data(u,v,num_leaves))
+
+	return data
+
+N = 100
+for n in range(20, 30):
+	D = gen_lambda_data(N, n)
+	avg = 0
+	for d in D:
+		avg = avg + d[1]
+	avg = avg/N
+	print(n, avg/D[0][0])
+
 # guess = 20*math.log(20)
 # D = gen_data(100,20)
 # print(D)
 # avg = sum([v[1] for v in D])/len(D)
 # print(avg)
 
-fig, ax = plt.subplots()  # Create a figure containing a single axes.
-ax.plot([i for i in range(4, 20)], [avg(100, i) for i in range(4,20)])  # Plot some data on the axes.
-ax.plot([i for i in range(4, 20)], [i*math.log(i) for i in range(4,20)])
-plt.show()
+# fig, ax = plt.subplots()  # Create a figure containing a single axes.
+# ax.plot([i for i in range(4, 20)], [avg(100, i) for i in range(4,20)])  # Plot some data on the axes.
+# ax.plot([i for i in range(4, 20)], [i*math.log(i) for i in range(4,20)])
+# plt.show()
 
 # for i in range(4, 20):
 # 	a = avg(100, i)
