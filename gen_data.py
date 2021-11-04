@@ -73,7 +73,7 @@ def gen_lambda_data(N, num_leaves):
 
 	return data
 
-N = 100
+N = 20
 for n in range(5, 40):
 	D = gen_lambda_data(N, n)
 	avg = 0
