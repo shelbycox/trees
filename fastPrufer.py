@@ -1,5 +1,6 @@
 import prufer as pf
 import numpy as np
+import matplotlib.pyplot as plt
 
 def fast_get_descendants(p):
 	n = len(p) + 2
@@ -100,9 +101,11 @@ def t_in_img(p,r,target):
 
 # print(t_in_img([5,5,6,7,7,6], [5,6,6,7,7,5], 6))
 
-N = 100
+N = 10000
 
-for i in range(5, 40):
+data = []
+
+for i in range(99,101):
 	hits = 0
 	for j in range(N):
 		p = pf.gen_prufer(i)
@@ -110,3 +113,7 @@ for i in range(5, 40):
 		if t_in_img(p,r,i+1):
 			hits = hits + 1
 	print(i, hits/N)
+	data.append((i, hits/N))
+
+with open('my_data.txt', 'a') as the_file:
+	the_file.write(str(data))

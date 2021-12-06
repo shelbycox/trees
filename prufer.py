@@ -103,6 +103,17 @@ def get_prufer(T):
 			u = u + 1
 	return P
 
+def gen_prufer(l):
+	##a trivalent tree on n leaves has n-2 internal vertices
+	n = l + (l - 2)
+
+	leaves = [i for i in range(l)]
+	internal = [i for i in range(l, n)]
+
+	##each internal vertex should appear twice in the Prufer sequence
+	perm = np.random.permutation(range(2*len(internal)))
+	return [internal[int(p/2)] for p in perm]
+
 ##use Prufer sequence to generate trees
 ##TESTED
 def build_tree(a):
