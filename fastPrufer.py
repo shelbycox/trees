@@ -102,7 +102,7 @@ def t_in_img(p,r,target):
 
 N = 100
 
-for i in range(5, 40):
+for i in range(150,151):
 	hits = 0
 	for j in range(N):
 		p = pf.gen_prufer(i)

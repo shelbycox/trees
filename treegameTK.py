@@ -15,9 +15,13 @@ line = tl.normalize_heights(tl.get_line_int(u,v), 2)
 
 trees = [dt.rec_vertices(T, 275/2, tl.rec_tree_paren(T, [i+1 for i in range(5)]), 275/2, None, [], []) for T in line]
 
-left = trees[0]
-curr = trees[1]
-right = trees[2]
+left_index = 0
+curr_index = 1
+right_index = 2
+
+left = trees[left_index]
+curr = trees[curr_index]
+right = trees[right_index]
 
 # u_info = dt.rec_vertices(u, 275/2, tl.rec_tree_paren(u, [i+1 for i in range(5)]), 275/2, None, [], [])
 
@@ -98,6 +102,49 @@ def click_load():
 
 	except FileNotFoundError:
 		print('No file to load!')
+
+def click_right():
+	if right_index >= len(trees) - 1:
+		pass
+
+	else:
+		if left_index == 0:
+			toggle_left()
+
+		left_index = left_index + 1
+		curr_index = curr_index + 1
+		right_index = right_index + 1
+
+		left = trees[left_index]
+		curr = trees[curr_index]
+		right = trees[curr_index]
+
+		if right_index == len(trees) - 1:
+			toggle_right()
+
+def click_left():
+	##if we're already at the start of the line, do nothing
+	if left_index == 0:
+		pass
+
+	else:
+		##if the right button was disabled, enable it
+		if right_index == len(trees) - 1:
+			toggle_right()
+
+		##dencrement the indices
+		left_index = left_index - 1
+		curr_index = curr_index - 1
+		right_index = right_index - 1
+
+		##update the trees
+		left = trees[left_index]
+		curr = trees[curr_index]
+		right = trees[curr_index]
+
+		##if we're at the start of the line, disable the left button
+		if left_index == 0:
+			toggle_left()
 
 ##change the title of the window
 window.title("Tree Game")
