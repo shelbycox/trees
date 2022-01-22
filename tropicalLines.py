@@ -87,6 +87,20 @@ def reduce_line(L):
 
 	return line
 
+def get_mu(u,v):
+	mu = {u[k] - v[k] : k for k in u.keys()}
+	data = sorted(set(mu.keys()))
+	return [mu[d] for d in data]
+
+def get_mu_int(u,v):
+	wout_int = get_mu(u,v)
+	to_return = [wout_int[0]]
+	for m in range(1,len(wout_int)):
+		to_return.append((0,0))
+		to_return.append(wout_int[m])
+
+	return to_return
+
 def get_line_int(u,v):
 	##get the reduced tropical line from u to v
 	line = get_tropical_line(u,v,True)

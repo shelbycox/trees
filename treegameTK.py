@@ -11,9 +11,11 @@ line = [0,1]
 u = {(1, 2): 40, (2, 1): 40, (1, 3): 40, (3, 1): 40, (1, 4): 40, (4, 1): 40, (1, 5): 40, (5, 1): 40, (2, 3): 30, (3, 2): 30, (2, 4): 30, (4, 2): 30, (2, 5): 30, (5, 2): 30, (3, 4): 20, (4, 3): 20, (3, 5): 20, (5, 3): 20, (4, 5): 10, (5, 4): 10}
 v = {(1, 2): 1, (2, 1): 1, (1, 3): 2, (3, 1): 2, (1, 4): 3, (4, 1): 3, (1, 5): 4, (5, 1): 4, (2, 3): 2, (3, 2): 2, (2, 4): 3, (4, 2): 3, (2, 5): 4, (5, 2): 4, (3, 4): 3, (4, 3): 3, (3, 5): 4, (5, 3): 4, (4, 5): 4, (5, 4): 4}
 
-line = tl.normalize_heights(tl.get_line_int(u,v), 2)
-
+line = tl.normalize_heights(tl.get_tropical_line(u,v), 2)
+mus = tl.get_mu(u,v)
 trees = [dt.rec_vertices(T, 275/2, tl.rec_tree_paren(T, [i+1 for i in range(5)]), 275/2, None, [], []) for T in line]
+
+global left_index, curr_index, right_index, mu
 
 left_index = 0
 curr_index = 1
@@ -22,6 +24,8 @@ right_index = 2
 left = trees[left_index]
 curr = trees[curr_index]
 right = trees[right_index]
+
+mu = mus[curr_index]
 
 # u_info = dt.rec_vertices(u, 275/2, tl.rec_tree_paren(u, [i+1 for i in range(5)]), 275/2, None, [], [])
 
@@ -104,25 +108,32 @@ def click_load():
 		print('No file to load!')
 
 def click_right():
+	global left_index, curr_index, right_index
+
+	##if we're already at the end of the line, do nothing
 	if right_index >= len(trees) - 1:
 		pass
 
 	else:
+		##if the left button was disabled, enable it
 		if left_index == 0:
-			toggle_left()
+			toggle_left(1)
 
+		##increment the indices
 		left_index = left_index + 1
 		curr_index = curr_index + 1
 		right_index = right_index + 1
 
-		left = trees[left_index]
-		curr = trees[curr_index]
-		right = trees[curr_index]
+		##update canvas
+		update_canvas()
 
+		##if we're at the end of the line, disable the right button
 		if right_index == len(trees) - 1:
-			toggle_right()
+			toggle_right(0)
 
 def click_left():
+	global left_index, curr_index, right_index
+
 	##if we're already at the start of the line, do nothing
 	if left_index == 0:
 		pass
@@ -130,21 +141,57 @@ def click_left():
 	else:
 		##if the right button was disabled, enable it
 		if right_index == len(trees) - 1:
-			toggle_right()
+			toggle_right(1)
 
 		##dencrement the indices
 		left_index = left_index - 1
 		curr_index = curr_index - 1
 		right_index = right_index - 1
 
-		##update the trees
-		left = trees[left_index]
-		curr = trees[curr_index]
-		right = trees[curr_index]
-
+		##update the canvas
+		update_canvas()
+		
 		##if we're at the start of the line, disable the left button
 		if left_index == 0:
-			toggle_left()
+			toggle_left(0)
+
+def toggle_left(t):
+	pass
+
+def toggle_right(t):
+	pass
+
+def update_canvas():
+	global tree_canvas_middle, tree_canvas_left, tree_canvas_right
+	global curr_index, right_index, left_index, mu
+
+	##delete old canvases
+	tree_canvas_middle.delete("all")
+	tree_canvas_left.delete("all")
+	tree_canvas_right.delete("all")
+	output_lambda.delete(0.0, END)
+
+	##generate new clean canvases
+	tree_canvas_middle = Canvas(window, width=275, height=275, bg="white")
+	tree_canvas_middle.grid(row=4, column=1)
+
+	tree_canvas_left = Canvas(window, width=275, height=275, bg="white")
+	tree_canvas_left.grid(row=4, column=0)
+
+	tree_canvas_right = Canvas(window, width=275, height=275, bg="white")
+	tree_canvas_right.grid(row=4, column=2)
+
+	##update the trees
+	left = trees[left_index]
+	curr = trees[curr_index]
+	right = trees[right_index]
+	mu = mus[curr_index]
+
+	##draw updated trees
+	draw_tree(left[0], left[1], tree_canvas_left)
+	draw_tree(curr[0], curr[1], tree_canvas_middle)
+	draw_tree(right[0], right[1], tree_canvas_right)
+	output_lambda.insert(END, str(mu))
 
 ##change the title of the window
 window.title("Tree Game")
@@ -171,11 +218,11 @@ output_n.insert(END, "n = " + str(n))
 
 ##button to save a pair of trees --> later save the whole path?
 button_save = Button(window, text="save", width=5, bg="white", fg="black", command=click_save)
-button_save.grid(row=3, column=1)
+button_save.grid(row=1, column=2)
 
 ##button to load a pair of trees/path
 button_load = Button(window, text="load", width=5, bg="white", fg="black", command=click_load)
-button_load.grid(row=2, column=1)
+button_load.grid(row=0, column=2)
 
 tree_canvas_middle = Canvas(window, width=275, height=275, bg="white")
 tree_canvas_middle.grid(row=4, column=1)
@@ -186,6 +233,16 @@ tree_canvas_left.grid(row=4, column=0)
 tree_canvas_right = Canvas(window, width=275, height=275, bg="white")
 tree_canvas_right.grid(row=4, column=2)
 
+button_right = Button(window, text="+", width=2, bg="white", fg="black", command=click_right)
+button_right.grid(row=3, column=2)
+
+button_left = Button(window, text="-", width=2, bg="white", fg="black", command=click_left)
+button_left.grid(row=3, column=0)
+
+output_lambda = Text(window, width=6, height=1, bg="white", fg="black")
+output_lambda.grid(row=3, column=1)
+output_lambda.insert(END, str(mu))
+
 ##draw a line
 # tree_canvas.create_line(0,100,300,100,fill="black")
 # tree_canvas.create_line(150,0,150,200,fill="black")
@@ -195,6 +252,6 @@ tree_canvas_right.grid(row=4, column=2)
 ##draw a tree
 draw_tree(left[0], left[1], tree_canvas_left)
 draw_tree(curr[0], curr[1], tree_canvas_middle)
-draw_tree(curr[0], curr[1], tree_canvas_right)
+draw_tree(right[0], right[1], tree_canvas_right)
 
 window.mainloop()
