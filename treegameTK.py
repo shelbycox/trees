@@ -6,17 +6,18 @@ import tropicalLines as tl
 
 window = Tk()
 
-u = tl.tree_to_dict([10,10,10,10,4,8,8,8,8,5], 5)
-v = tl.tree_to_dict([9,9,9,10,7,7,10,6,10,10], 5)
+u = tl.tree_to_dict([9,13,13,15,15,13,13,15,15,10,15,15,15,15,12], 6)
+v = tl.tree_to_dict([11,8,11,14,15,11,7,14,15,11,14,15,14,15,15], 6)
+# u = tl.tree_to_dict([3,3,2], 3)
+# v = tl.tree_to_dict([1,3,3], 3)
 
-n = 5
-line = [0,1]
+n = 6
 # u = {(1, 2): 10, (2, 1): 10, (1, 3): 10, (3, 1): 10, (1, 4): 10, (4, 1): 10, (1, 5): 10, (5, 1): 10, (2, 3): 4, (3, 2): 4, (2, 4): 8, (4, 2): 8, (2, 5): 8, (5, 2): 8, (3, 4): 8, (4, 3): 8, (3, 5): 8, (5, 3): 8, (4, 5): 5, (5, 4): 5}
 # v = {(1, 2): 9, (2, 1): 9, (1, 3): 9, (3, 1): 9, (1, 4): 9, (4, 1): 9, (1, 5): 10, (5, 1): 10, (2, 3): 7, (3, 2): 7, (2, 4): 7, (4, 2): 7, (2, 5): 10, (5, 2): 10, (3, 4): 6, (4, 3): 6, (3, 5): 10, (5, 3): 10, (4, 5): 10, (5, 4): 10}
 
 line = tl.normalize_heights(tl.get_tropical_line(u,v), 2)
 mus = tl.get_mu(u,v)
-trees = [dt.rec_vertices(T, 275/2, tl.rec_tree_paren(T, [i+1 for i in range(5)]), 275/2, None, [], []) for T in line]
+trees = [dt.rec_vertices(T, 275/2, tl.rec_tree_paren(T, [i+1 for i in range(n)]), 275/2, None, [], []) for T in line]
 
 global left_index, curr_index, right_index, mu
 
@@ -146,7 +147,7 @@ def click_left():
 		if right_index == len(trees) - 1:
 			toggle_right(1)
 
-		##dencrement the indices
+		##decrement the indices
 		left_index = left_index - 1
 		curr_index = curr_index - 1
 		right_index = right_index - 1
