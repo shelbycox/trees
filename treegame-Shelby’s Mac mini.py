@@ -12,18 +12,32 @@ from mouseover import *
 
 ##special starting trees
 ##gives an example of a line segment in codimension 1
-u = {(1, 2): 10, (2, 1): 10, (1, 3): 200, (3, 1): 200, (1, 4): 200, (4, 1): 200, (1, 5): 2, (5, 1): 2, (1, 6): 10, (6, 1): 10, (1, 7): 200, (7, 1): 200, (1, 8): 200, (8, 1): 200, (2, 3): 200, (3, 2): 200, (2, 4): 200, (4, 2): 200, (2, 5): 10, (5, 2): 10, (2, 6): 6, (6, 2): 6, (2, 7): 200, (7, 2): 200, (2, 8): 200, (8, 2): 200, (3, 4): 12, (4, 3): 12, (3, 5): 200, (5, 3): 200, (3, 6): 200, (6, 3): 200, (3, 7): 4, (7, 3): 4, (3, 8): 12, (8, 3): 12, (4, 5): 200, (5, 4): 200, (4, 6): 200, (6, 4): 200, (4, 7): 12, (7, 4): 12, (4, 8): 8, (8, 4): 8, (5, 6): 10, (6, 5): 10, (5, 7): 200, (7, 5): 200, (5, 8): 200, (8, 5): 200, (6, 7): 200, (7, 6): 200, (6, 8): 200, (8, 6): 200, (7, 8): 12, (8, 7): 12}
-v = {(1, 2): 2, (2, 1): 2, (1, 3): 4, (3, 1): 4, (1, 4): 6, (4, 1): 6, (1, 5): 8, (5, 1): 8, (1, 6): 8, (6, 1): 8, (1, 7): 8, (7, 1): 8, (1, 8): 8, (8, 1): 8, (2, 3): 4, (3, 2): 4, (2, 4): 6, (4, 2): 6, (2, 5): 8, (5, 2): 8, (2, 6): 8, (6, 2): 8, (2, 7): 8, (7, 2): 8, (2, 8): 8, (8, 2): 8, (3, 4): 6, (4, 3): 6, (3, 5): 8, (5, 3): 8, (3, 6): 8, (6, 3): 8, (3, 7): 8, (7, 3): 8, (3, 8): 8, (8, 3): 8, (4, 5): 8, (5, 4): 8, (4, 6): 8, (6, 4): 8, (4, 7): 8, (7, 4): 8, (4, 8): 8, (8, 4): 8, (5, 6): 5, (6, 5): 5, (5, 7): 5, (7, 5): 5, (5, 8): 5, (8, 5): 5, (6, 7): 3, (7, 6): 3, (6, 8): 3, (8, 6): 3, (7, 8): 1, (8, 7): 1}
+# u = {(1, 2): 40, (2, 1): 40, (1, 3): 40, (3, 1): 40, (1, 4): 40, (4, 1): 40, (1, 5): 40, (5, 1): 40, (2, 3): 30, (3, 2): 30, (2, 4): 30, (4, 2): 30, (2, 5): 30, (5, 2): 30, (3, 4): 20, (4, 3): 20, (3, 5): 20, (5, 3): 20, (4, 5): 10, (5, 4): 10}
+# v = {(1, 2): 1, (2, 1): 1, (1, 3): 2, (3, 1): 2, (1, 4): 3, (4, 1): 3, (1, 5): 4, (5, 1): 4, (2, 3): 2, (3, 2): 2, (2, 4): 3, (4, 2): 3, (2, 5): 4, (5, 2): 4, (3, 4): 3, (4, 3): 3, (3, 5): 4, (5, 3): 4, (4, 5): 4, (5, 4): 4}
 # print(argmaxm(u))
 # print(argmaxm(v))
 # print(rec_tree_paren(u, [i+1 for i in range(6)]))
 # print(rec_tree_paren(v, [i+1 for i in range(6)]))
 
+a = 3
+q = 2
+b = 3
+c = 5
+
+u = {(1, 2): a, (2, 1): a, (1, 3): 10, (3, 1): 10, (1, 4): 10, (4, 1): 10, (2, 3): 10, (3, 2): 10, (2, 4): 10, (4, 2): 10, (3, 4): q, (4, 3): q}
+v = {(1, 2): b, (2, 1): b, (1, 3): b+c, (3, 1): b+c, (1, 4): 10, (4, 1): 10, (2, 3): b+c, (3, 2): b+c, (2, 4): 10, (4, 2): 10, (3, 4): 10, (4, 3): 10}
+
 line = normalize_heights(get_line_int(u,v), 2)
+for l in line:
+	print(l)
 
-trees = [rec_vertices(T, 375/2, rec_tree_paren(T, [i+1 for i in range(8)]), 300/2, None, [], []) for T in line]
+for i in range(1,4):
+	for j in range(i+1,5):
+		print(u[(i,j)] - v[(i,j)])
 
-n = 6
+trees = [rec_vertices(T, 375/2, rec_tree_paren(T, [i+1 for i in range(4)]), 300/2, None, [], []) for T in line]
+
+n = 4
 
 ##drawing methods
 ##draws the trees (i-1), i, (i+1) in a row (if they all exist)
@@ -97,6 +111,16 @@ def draw_background(P):
 		screen.blit(text_surface_1, dest=(400, 310))
 		text_surface_2 = font.render('ccd:' + str(get_coarse_codim(line[2*current[-1] + current[0]])), True, (0, 0, 0))
 		screen.blit(text_surface_2, dest=(400, 335))
+		text_contribution = font.render('cont: ' + str(contribution(line[2*current[-1] + current[0]],n)), True, (0, 0, 0))
+		screen.blit(text_contribution, dest=(400, 360))
+
+		##write the prufer sequence under the middle tree
+		text_prufer = font.render(str(get_prufer(get_adj(line[2*current[-1] + current[0]], n))), True, (0, 0, 0))
+		screen.blit(text_prufer, dest=(400, 585))
+
+		##write the lambda coefficient under the middle tree
+		# text_lambda = font.render(str(line[2*current[-1] + current[0]][-1]), True, (0,0,0))
+		# screen.blit(text_lambda, dest=(450, 585))
 
 		draw_trees(trees, 2*current[-1] + current[0])
 
@@ -120,6 +144,10 @@ def draw_background(P):
 	pygame.draw.rect(screen, pink, load_button)
 	load_button_text = font.render('load', True, (0,0,0))
 	screen.blit(load_button_text, dest=(735, 40))
+
+	##write the NNI distance
+	text_nni_dist = font.render('NNI distance: ' + str(nni_distance(u,v,n)), True, (0, 0, 0))
+	screen.blit(text_nni_dist, dest=(735, 265))
 
 ##color names
 red = (255,0,0)

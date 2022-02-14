@@ -103,7 +103,18 @@ def get_prufer(T):
 			u = u + 1
 	return P
 
-##use a Prufer sequence to generate the adjacency matrix for a tree
+def gen_prufer(l):
+	##a trivalent tree on n leaves has n-2 internal vertices
+	n = l + (l - 2)
+
+	leaves = [i for i in range(l)]
+	internal = [i for i in range(l, n)]
+
+	##each internal vertex should appear twice in the Prufer sequence
+	perm = np.random.permutation(range(2*len(internal)))
+	return [internal[int(p/2)] for p in perm]
+
+##use Prufer sequence to generate trees
 ##TESTED
 def build_tree(a):
 	n = len(a) + 2
@@ -139,17 +150,6 @@ def build_tree(a):
 
 	##return the adjacency matrix T
 	return T
-
-def gen_prufer(l):
-	##a trivalent tree on n leaves has n-2 internal vertices
-	n = l + (l - 2)
-
-	leaves = [i for i in range(l)]
-	internal = [i for i in range(l, n)]
-
-	##each internal vertex should appear twice in the Prufer sequence
-	perm = np.random.permutation(range(2*len(internal)))
-	return [internal[int(p/2)] for p in perm]
 
 ##generate a random trivalent tree on l leaves
 ##TESTED
@@ -548,12 +548,12 @@ def rand_pair(n):
 
 	return {(i,j) : m[(i,j)] for (i,j) in m.keys() if i != 0 and j != 0}, {(i,j) : n[(i,j)] for (i,j) in n.keys() if i != 0 and j != 0}
 
-u = gen_tree(10)
-for i in range(100):
-	u = gen_tree(10)
-	v = gen_tree(11)
+# u = gen_tree(10)
+# for i in range(100):
+# 	u = gen_tree(10)
+# 	v = gen_tree(11)
 
-print(get_metric(u))
+# print(get_metric(u))
 # print(get_ranking(u, 16))
 # for i in range(9, 16):
 # 	print(i, get_dist(u.copy(), 0, i, 0))

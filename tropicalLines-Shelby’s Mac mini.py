@@ -1,4 +1,5 @@
 import operator
+import numpy as np
 
 error = 0
 
@@ -85,6 +86,20 @@ def reduce_line(L):
 		i = i + 1
 
 	return line
+
+def get_mu(u,v):
+	mu = {u[k] - v[k] : k for k in u.keys()}
+	data = sorted(set(mu.keys()))
+	return [mu[d] for d in data]
+
+def get_mu_int(u,v):
+	wout_int = get_mu(u,v)
+	to_return = [wout_int[0]]
+	for m in range(1,len(wout_int)):
+		to_return.append((0,0))
+		to_return.append(wout_int[m])
+
+	return to_return
 
 def get_line_int(u,v):
 	##get the reduced tropical line from u to v
@@ -195,3 +210,156 @@ def all_pairs(a):
 
 def get_heights(u):
 	return sorted(set([h for h in u.values()]))
+
+def tree_to_dict(u, n):
+	##given a vector, get a dict
+	u_dict = dict()
+	i = 1
+	j = 2
+	for dex in u:
+		u_dict[(i,j)] = dex
+		u_dict[(j,i)] = dex
+		if j < n:
+			j = j + 1
+		else:
+			i = i + 1
+			j = i + 1
+
+	return u_dict
+
+def compare_coarse(u,v,n):
+	##returns true if u,v have the same coarse structure
+	##false otherwise
+
+	##idea: prufer sequences will tell me if the trees have the same coarse structure
+	##so reconstruct the prufer sequence
+	p = get_prufer(get_adj(u,n))
+	q = get_prufer(get_adj(v,n))
+	return p == q
+
+def reduce_coarse(line,n):
+	new_line = line.copy()
+	i = 0
+	while True:
+		if i >= len(new_line) - 1:
+			break
+		if compare_coarse(new_line[i], new_line[i+1], n):
+			new_line.pop(i+1)
+		else:
+			i = i + 1
+
+	return new_line
+
+
+def nni_distance(u,v,n):
+	line = reduce_coarse(get_tropical_line(u,v),n)
+	count = 0
+	for T in line:
+		count = count + contribution(T,n)
+	return count
+
+##what about when we stay in codimension 1 or 2 for a while?
+##need to properly reduce the line!
+
+def contribution(u,n):
+	C = 0
+	P = get_prufer(get_adj(u,n))[:-1]
+	internal_vertices = list(set(P))
+	for v in internal_vertices:
+		c = P.count(v)
+		# print(v, 'appears', c, 'times')
+		if v == n + 1:
+			if c > 1:
+				C = C + (c - 1)
+		else:
+			if c > 2:
+				C = C + (c - 2)
+
+	return C
+
+## could I recover the prufer sequence from the metric instead?
+## get argmaxm
+## name the top vertex j
+## save the left and right vertices of j
+def get_adj(u, num_leaves):
+	A = argmaxm(u)
+	num_verts = 2*num_leaves - 1
+	j = num_leaves + 1
+
+	##children will store the descendants of internal nodes
+	children = dict()
+
+	##adj will store the adjacency matrix of u
+	adj = np.zeros((num_verts, num_verts))
+
+	##consider adding a 0 leaf
+
+	##STEP 1: connect internal vertices
+	##loop through heights of internal vertices
+	for a in A:
+		##get the distinct internal vertices that share the same height h
+		ties = get_ties(a)
+		# print('ties', ties)
+		##get the children of each internal vertex at height h
+		for v in range(len(ties)):
+			children[j + v] = ties[v]
+			# print('finding parent of', j+v)
+
+			##now find the parent of the current internal vertex j+v
+			for k in list(range(num_leaves + 1, j))[::-1]:
+				##it will be the last internal vertex added whose descendants contain j+v's descendants
+				if set(children[j + v]).issubset(set(children[k])):
+					# print('attaching', j+v, k)
+					adj[k-1][j+v-1] = adj[j+v-1][k-1] = 1
+					##each internal vertex has exactly one parent
+					break
+		j = j + v + 1
+
+	##STEP 2: connect leaves to internal vertices
+	##loop through leaves
+	for i in range(num_leaves):
+		##find the last internal vertex added with i+1 as a descendant
+		for k in list(range(num_leaves + 1, j))[::-1]:
+				if i+1 in children[k]:
+					adj[k-1][i] = adj[i][k-1] = 1
+					##i+1 is the child of exactly one internal vertex
+					break
+
+	return adj
+
+def get_ties(a):
+	leaves = list(set([i for (i,j) in a]))
+	ties = {j : j for j in leaves}
+	for (i,j) in a:
+		m = min(ties[i], ties[j])
+		ties[i] = ties[j] = m
+
+	return [[i for i in leaves if ties[i] == j] for j in list(set(ties.values()))]
+
+def get_prufer(T_x):
+	T = T_x.copy()
+	P = []
+	u = 0
+	while u < len(T):
+		# print(u)
+		##if i is a leaf
+		if np.count_nonzero(T[u]) == 1:
+			##find the vertex adjacent to i
+			v = -1
+			for i in range(len(T)):
+				if T[u][i] != 0:
+					v = i
+					break
+
+			##add it to the Prufer sequence
+			P.append(v)
+
+			##remove the edges from i to v
+			T[u][v] = 0
+			T[v][u] = 0
+
+			##reset u to the start of the list
+			u = 0
+		else:
+			u = u + 1
+	return [p + 1 for p in P]
