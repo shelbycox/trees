@@ -3,6 +3,12 @@ from tkinter.filedialog import askopenfilename
 import ast
 import drawTreeTk as dt
 import tropicalLines as tl
+import os
+from PIL import Image, ImageDraw
+
+##colors for PIL
+white = (255, 255, 255)
+black = (0, 0, 0)
 
 window = Tk()
 
@@ -10,6 +16,8 @@ u = tl.tree_to_dict([9,13,13,15,15,13,13,15,15,10,15,15,15,15,12], 6)
 v = tl.tree_to_dict([11,8,11,14,15,11,7,14,15,11,14,15,14,15,15], 6)
 # u = tl.tree_to_dict([3,3,2], 3)
 # v = tl.tree_to_dict([1,3,3], 3)
+
+width = height = 275
 
 n = 6
 # u = {(1, 2): 10, (2, 1): 10, (1, 3): 10, (3, 1): 10, (1, 4): 10, (4, 1): 10, (1, 5): 10, (5, 1): 10, (2, 3): 4, (3, 2): 4, (2, 4): 8, (4, 2): 8, (2, 5): 8, (5, 2): 8, (3, 4): 8, (4, 3): 8, (3, 5): 8, (5, 3): 8, (4, 5): 5, (5, 4): 5}
@@ -32,6 +40,12 @@ right = trees[right_index]
 mu = mus[curr_index]
 
 # u_info = dt.rec_vertices(u, 275/2, tl.rec_tree_paren(u, [i+1 for i in range(5)]), 275/2, None, [], [])
+def get_bounding_box(x,y,r):
+	x0 = x - r
+	x1 = x + r
+	y0 = y - r
+	y1 = y + r
+	return [(x0,y0), (x1,y1)]
 
 def draw_circle(x,y,r, canvas_name, f="black"):
 	x0 = x - r
@@ -40,7 +54,44 @@ def draw_circle(x,y,r, canvas_name, f="black"):
 	y1 = y + r
 	return canvas_name.create_oval(x0,y0,x1,y1,fill=f)
 
+def print_trees(folder_name):
+	i=1
+	for t in trees:
+		print_tree(i, t[0], t[1], folder_name)
+		i = i + 1
+
+def print_tree(i, vt, ed, folder_name):
+	##PIL image to draw in parallel and save
+	image1 = Image.new('RGB', (width, height), white)
+	draw = ImageDraw.Draw(image1)
+
+	for e in ed:
+		start, end = e
+		if len(start) > 2:
+			start = (start[0], 255)
+		if len(end) > 2:
+			end = (end[0], 255)
+		start = (start[0], start[1])
+		end = (end[0], end[1])
+		draw.line([start[0],start[1],end[0],end[1]],fill=black)
+
+	for v in vt:
+		if v[1] == -1:
+			##put the number of the leaf at (v[0], 5)
+			draw.text(xy=(v[0], 265), text=str(v[2]))
+		else:
+			##if it's an internal vertex, draw a node
+			print(get_bounding_box(v[0], 265, 3))
+			draw.ellipse(get_bounding_box(v[0], v[1], 3), fill=black)
+
+	filename = folder_name + '/tree_' + str(i) + '.jpg'
+	image1.save(filename)
+
 def draw_tree(vt, ed, canvas_name):
+	##PIL image to draw in parallel and save
+	image1 = Image.new('RGB', (width, height), white)
+	draw = ImageDraw.Draw(image1)
+
 	for e in ed:
 		start, end = e
 		if len(start) > 2:
@@ -50,14 +101,17 @@ def draw_tree(vt, ed, canvas_name):
 		start = (start[0], start[1])
 		end = (end[0], end[1])
 		canvas_name.create_line(start[0],start[1],end[0],end[1],fill="black")
+		draw.line([start[0],start[1],end[0],end[1]],fill=black)
 
 	for v in vt:
 		if v[1] == -1:
 			##put the number of the leaf at (v[0], 5)
 			canvas_name.create_text(v[0], 265, text=str(v[2]))
+			draw.text(xy=(v[0], 265), text=str(v[2]))
 		else:
 			##if it's an internal vertex, draw a node
 			draw_circle(v[0], v[1], 3, canvas_name)
+			draw.ellipse(get_bounding_box(v[0], v[1], 3), fill=black)
 
 ##define button clicks
 def click_n():
