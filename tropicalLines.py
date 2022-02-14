@@ -3,6 +3,22 @@ import numpy as np
 
 error = 0
 
+def tree_to_dict(u, n):
+	##given a vector, get a dict
+	u_dict = dict()
+	i = 1
+	j = 2
+	for dex in u:
+		u_dict[(i,j)] = dex
+		u_dict[(j,i)] = dex
+		if j < n:
+			j = j + 1
+		else:
+			i = i + 1
+			j = i + 1
+
+	return u_dict
+
 def normalize_heights(L, h):
 	for t in L:
 		tree_height = max([t[k] for k in t.keys()])
