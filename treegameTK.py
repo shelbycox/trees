@@ -87,6 +87,8 @@ def print_tree(i, vt, ed, folder_name):
 	filename = folder_name + '/tree_' + str(i) + '.jpg'
 	image1.save(filename)
 
+print_trees('test')
+
 def draw_tree(vt, ed, canvas_name):
 	##PIL image to draw in parallel and save
 	image1 = Image.new('RGB', (width, height), white)
