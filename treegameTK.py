@@ -79,6 +79,7 @@ def print_tree(i, vt, ed, folder_name):
 		if v[1] == -1:
 			##put the number of the leaf at (v[0], 5)
 			draw.text(xy=(v[0], 265), text=str(v[2]))
+
 		else:
 			##if it's an internal vertex, draw a node
 			print(get_bounding_box(v[0], 265, 3))
@@ -103,17 +104,17 @@ def draw_tree(vt, ed, canvas_name):
 		start = (start[0], start[1])
 		end = (end[0], end[1])
 		canvas_name.create_line(start[0],start[1],end[0],end[1],fill="black")
-		draw.line([start[0],start[1],end[0],end[1]],fill=black)
+		# draw.line([start[0],start[1],end[0],end[1]],fill=black)
 
 	for v in vt:
 		if v[1] == -1:
 			##put the number of the leaf at (v[0], 5)
 			canvas_name.create_text(v[0], 265, text=str(v[2]))
-			draw.text(xy=(v[0], 265), text=str(v[2]))
+			# draw.text(xy=(v[0], 265), text=str(v[2]))
 		else:
 			##if it's an internal vertex, draw a node
 			draw_circle(v[0], v[1], 3, canvas_name)
-			draw.ellipse(get_bounding_box(v[0], v[1], 3), fill=black)
+			# draw.ellipse(get_bounding_box(v[0], v[1], 3), fill=black)
 
 ##define button clicks
 def click_n():
