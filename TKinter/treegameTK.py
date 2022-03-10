@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.filedialog import askopenfilename
 import ast
 import drawTreeTk as dt
-import tropicalLines as tl
+from treeGit.Math import tropicalLines as tl
 import os
 from PIL import Image, ImageDraw
 
