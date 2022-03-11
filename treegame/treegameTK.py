@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.filedialog import askopenfilename
 import ast
 import drawTreeTk as dt
-from treeGit.Math import tropicalLines as tl
+import tropicalLines as tl
 import os
 from PIL import Image, ImageDraw
 
@@ -73,22 +73,22 @@ def print_tree(i, vt, ed, folder_name):
 			end = (end[0], 255)
 		start = (start[0], start[1])
 		end = (end[0], end[1])
-		draw.line([start[0],start[1],end[0],end[1]],fill=black)
+		draw.line([start[0],start[1],end[0],end[1]], fill=black)
+		draw.text(((start[0] + end[0])/2 - 2, (start[1] + end[1])/2), 'l', (0,0,0))
 
 	for v in vt:
 		if v[1] == -1:
 			##put the number of the leaf at (v[0], 5)
-			draw.text(xy=(v[0], 265), text=str(v[2]))
+			draw.text((v[0]-2, 260), str(v[2]), (0,0,0))
 
 		else:
 			##if it's an internal vertex, draw a node
-			print(get_bounding_box(v[0], 265, 3))
 			draw.ellipse(get_bounding_box(v[0], v[1], 3), fill=black)
 
 	filename = folder_name + '/tree_' + str(i) + '.jpg'
 	image1.save(filename)
 
-print_trees('test')
+#print_trees('example')
 
 def draw_tree(vt, ed, canvas_name):
 	##PIL image to draw in parallel and save

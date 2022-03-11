@@ -20,7 +20,7 @@
 
 ##STEP 1: Get Prufer sequence
 
-import Math.tropicalLines as tl
+import tropicalLines as tl
 
 ##given a tree as a metric u (on pairs of leaves), find the Prufer sequence
 # def prufer_from_metric(u):
