@@ -3,3 +3,9 @@
 /venv
 \env
 .DS_Store
+/cd
+\cd
+/bin
+\bin
+/lib
+\lib
