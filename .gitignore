@@ -142,3 +142,5 @@ dmypy.json
 *.pyc
 *.pyo
 __pycache__/
+/example
+\example

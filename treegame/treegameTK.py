@@ -6,20 +6,25 @@ import tropicalLines as tl
 import os
 from PIL import Image, ImageDraw
 
+#set num of leaves
+n = 8
+
 ##colors for PIL
 white = (255, 255, 255)
 black = (0, 0, 0)
 
 window = Tk()
 
-u = tl.tree_to_dict([9,13,13,15,15,13,13,15,15,10,15,15,15,15,12], 6)
-v = tl.tree_to_dict([11,8,11,14,15,11,7,14,15,11,14,15,14,15,15], 6)
+u = tl.tree_to_dict([10,200,200,2,10,200,200,200,200,10,6,200,200,12,200,200,4,12,200,200,12,8,10,200,200,200,200,12], n)
+v = tl.tree_to_dict([200,400,600,800,800,800,800,400,600,800,800,800,800,600,800,800,800,800,800,800,800,800,600,600,600,400,400,200], n)
+
+# u = tl.tree_to_dict([9,13,13,15,15,13,13,15,15,10,15,15,15,15,12], 6)
+# v = tl.tree_to_dict([11,8,11,14,15,11,7,14,15,11,14,15,14,15,15], 6)
 # u = tl.tree_to_dict([3,3,2], 3)
 # v = tl.tree_to_dict([1,3,3], 3)
 
 width = height = 275
 
-n = 6
 # u = {(1, 2): 10, (2, 1): 10, (1, 3): 10, (3, 1): 10, (1, 4): 10, (4, 1): 10, (1, 5): 10, (5, 1): 10, (2, 3): 4, (3, 2): 4, (2, 4): 8, (4, 2): 8, (2, 5): 8, (5, 2): 8, (3, 4): 8, (4, 3): 8, (3, 5): 8, (5, 3): 8, (4, 5): 5, (5, 4): 5}
 # v = {(1, 2): 9, (2, 1): 9, (1, 3): 9, (3, 1): 9, (1, 4): 9, (4, 1): 9, (1, 5): 10, (5, 1): 10, (2, 3): 7, (3, 2): 7, (2, 4): 7, (4, 2): 7, (2, 5): 10, (5, 2): 10, (3, 4): 6, (4, 3): 6, (3, 5): 10, (5, 3): 10, (4, 5): 10, (5, 4): 10}
 
@@ -74,7 +79,7 @@ def print_tree(i, vt, ed, folder_name):
 		start = (start[0], start[1])
 		end = (end[0], end[1])
 		draw.line([start[0],start[1],end[0],end[1]], fill=black)
-		draw.text(((start[0] + end[0])/2 - 2, (start[1] + end[1])/2), 'l', (0,0,0))
+		#draw.text(((start[0] + end[0])/2 - 2, (start[1] + end[1])/2), 'l', (0,0,0))
 
 	for v in vt:
 		if v[1] == -1:
@@ -87,8 +92,6 @@ def print_tree(i, vt, ed, folder_name):
 
 	filename = folder_name + '/tree_' + str(i) + '.jpg'
 	image1.save(filename)
-
-#print_trees('example')
 
 def draw_tree(vt, ed, canvas_name):
 	##PIL image to draw in parallel and save
@@ -115,6 +118,10 @@ def draw_tree(vt, ed, canvas_name):
 			##if it's an internal vertex, draw a node
 			draw_circle(v[0], v[1], 3, canvas_name)
 			# draw.ellipse(get_bounding_box(v[0], v[1], 3), fill=black)
+
+##define print button
+def click_print():
+	print_trees('example')
 
 ##define button clicks
 def click_n():
@@ -264,8 +271,12 @@ window.configure(background="white")
 Label(window, text='Tree Game', bg="white", fg="black", font="none 24").grid(row=0, column=0)
 
 ##text entry box
-enter_n = Entry(window, width=5)
-enter_n.grid(row=1, column=0)
+# enter_n = Entry(window, width=5)
+# enter_n.grid(row=1, column=0)
+
+##button to print trees to png
+button_print = Button(window, text="print", width=5, bg="white", fg="black", command=click_print)
+button_print.grid(row=1,column=0)
 
 ##create a button
 button_n = Button(window, text="update n", width=8, bg="white", fg="black", command=click_n)
