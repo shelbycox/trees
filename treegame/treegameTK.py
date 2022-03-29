@@ -20,8 +20,15 @@ v = tl.tree_to_dict([200,400,600,800,800,800,800,400,600,800,800,800,800,600,800
 
 # u = tl.tree_to_dict([9,13,13,15,15,13,13,15,15,10,15,15,15,15,12], 6)
 # v = tl.tree_to_dict([11,8,11,14,15,11,7,14,15,11,14,15,14,15,15], 6)
-# u = tl.tree_to_dict([3,3,2], 3)
-# v = tl.tree_to_dict([1,3,3], 3)
+
+# u = tl.tree_to_dict([3,3,2], n)
+# v = tl.tree_to_dict([1,3,3], n)
+
+# u = tl.tree_to_dict([3,4,4,4,4,1], n)
+# v = tl.tree_to_dict([3,2,3,3,1,3], n)
+
+# u = tl.tree_to_dict([3,3,3,2,2,1], n)
+# v = tl.tree_to_dict([8,8,8,3,3,1], n)
 
 width = height = 275
 
@@ -31,6 +38,7 @@ width = height = 275
 line = tl.normalize_heights(tl.get_tropical_line(u,v), 2)
 mus = tl.get_mu(u,v)
 trees = [dt.rec_vertices(T, 275/2, tl.rec_tree_paren(T, [i+1 for i in range(n)]), 275/2, None, [], []) for T in line]
+heights = [tl.get_heights(x) for x in line]
 
 global left_index, curr_index, right_index, mu
 
@@ -62,7 +70,7 @@ def draw_circle(x,y,r, canvas_name, f="black"):
 def print_trees(folder_name):
 	i=1
 	for t in trees:
-		print_tree(i, t[0], t[1], folder_name)
+		print_tree_latex(i, t[0], t[1], tl.get_heights(line[i-1]), folder_name)
 		i = i + 1
 
 def print_tree(i, vt, ed, folder_name):
@@ -92,6 +100,52 @@ def print_tree(i, vt, ed, folder_name):
 
 	filename = folder_name + '/tree_' + str(i) + '.jpg'
 	image1.save(filename)
+
+def print_tree_latex(i, vt, ed, heights, folder_name):
+	with open('{}/tree_{}.txt'.format(folder_name, i), 'w') as file:
+
+		##want to divide all the numbers by 100 probably -- will that scale???
+
+		file.write('\\begin{minipage}{.333333\\textwidth}\n')
+		file.write('\t\\centering\n')
+		file.write('\t\\begin{tikzpicture}\n')
+
+		for e in ed:
+			start, end = e
+			if len(start) > 2:
+				start = (start[0], 280)
+			if len(end) > 2:
+				end = (end[0], 280)
+			start = (start[0], start[1])
+			end = (end[0], end[1])
+			file.write('\t\t\\draw ({},{})--({},{});\n'.format(start[0]/100, -start[1]/100, end[0]/100, -end[1]/100))
+
+		vert_heights = []
+
+		for v in vt:
+			if v[1] == -1:
+				##put the number of the leaf at (v[0], -2.8)
+				file.write('\t\t\\node[below] at ({},-2.8){{${}$}};\n'.format((v[0]-2)/100, str(v[2])))
+
+			else:
+				##if it's an internal vertex, draw a circle
+				file.write('\t\t\\filldraw ({},{}) circle (1.5pt);\n'.format(v[0]/100, -v[1]/100))
+				vert_heights.append(-v[1]/100)
+
+		vert_heights = sorted(list(set(vert_heights)))
+
+		##dashed lines for the heights
+		##draw them at the height of the drawn internal vertices
+		for j in range(len(vert_heights)):
+			v = vert_heights[j]
+			m = min(heights)
+			file.write('\t\t\\draw[dashed] (-.05,{})--(2.48,{});\n'.format(v,v))
+			file.write('\t\t\\node[left] at (-.05,{}){{\\tiny{}}};\n'.format(v,heights[j]-m+1))
+
+		file.write('\t\\end{tikzpicture}\n')
+		file.write('\\end{minipage}')
+
+		##close file
 
 def draw_tree(vt, ed, canvas_name):
 	##PIL image to draw in parallel and save

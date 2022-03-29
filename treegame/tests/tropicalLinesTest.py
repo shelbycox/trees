@@ -154,7 +154,7 @@ class TestGetCoarseCodim(unittest.TestCase):
 	##star tree, generic tree for different numbers of leaves
 	pass
 
-class TestAllPaires(unittest.TestCase):
+class TestAllPairs(unittest.TestCase):
 	##do some small known examples
 	##test that it gets the right list of elements also
 	pass
@@ -162,7 +162,8 @@ class TestAllPaires(unittest.TestCase):
 class TestGetHeights(unittest.TestCase):
 	##do some small knwon examples
 	##confirm there are the correct number of heights for star tree, generic trees, some in between
-	pass
+	u = tl.tree_to_dict([9,13,13,15,15,13,13,15,15,10,15,15,15,15,12], 6)
+	print(u.get_heights())
 
 if __name__ == '__main__':
     unittest.main()
