@@ -7,7 +7,7 @@ import os
 from PIL import Image, ImageDraw
 
 #set num of leaves
-n = 8
+n = 5
 
 ##colors for PIL
 white = (255, 255, 255)
@@ -108,12 +108,27 @@ window = Tk()
 # 		#910
 # ]
 
-u = tl.tree_to_dict([9,190,190,3,9,190,190,190,190,9,7,190,190,21,190,190,4,21,190,190,21,8,9,190,190,190,190,21], n)
-##                   12   13  14  15  16  17  18  23  24  25  26  27  28  34  35  36  37  38  45  46  47  48  56  57  58  67  68  78
-v = tl.tree_to_dict([200,400,600,800,800,800,800,400,600,800,800,800,800,600,800,800,800,800,800,800,800,800,700,700,700,500,500,300], n)
+# u = tl.tree_to_dict([9,190,190,3,9,190,190,190,190,9,7,190,190,21,190,190,4,21,190,190,21,8,9,190,190,190,190,21], n)
+# ##                   12   13  14  15  16  17  18  23  24  25  26  27  28  34  35  36  37  38  45  46  47  48  56  57  58  67  68  78
+# v = tl.tree_to_dict([200,400,600,800,800,800,800,400,600,800,800,800,800,600,800,800,800,800,800,800,800,800,700,700,700,500,500,300], n)
 
-print(u)
-print(v)
+##                   12  13 14 15  16 23  24  25  26  34  35  36  45  46  56
+# u = tl.tree_to_dict([10,10, 4, 10, 10, 1, 10,  3,  2, 10,  3,  2, 10, 10, 3], n)
+# v = tl.tree_to_dict([10,10,10, 6,  8,  7,  7, 10, 10,  5, 10, 10, 10, 10, 8], n)
+
+U = []
+V = []
+for i in range(5):
+	for j in range(i+1,5):
+		U.append(n*(n-min(i+1,j+1)))
+		V.append((max(i+1,j+1) - 1))
+
+u = tl.tree_to_dict(U, n)
+v = tl.tree_to_dict(V, n)
+
+
+# u = tl.tree_to_dict([10, 10, 7, 10, 10, 8, 10, 4, 8, 10, 8, 1, 10, 10, 8], n)
+# v = tl.tree_to_dict([10, 6, 3, 10, 6, 10, 10, 5, 10, 6, 10, 2, 10, 6, 10], n)
 
 # u = tl.tree_to_dict([9,13,13,15,15,13,13,15,15,10,15,15,15,15,12], 6)
 # v = tl.tree_to_dict([11,8,11,14,15,11,7,14,15,11,14,15,14,15,15], 6)
@@ -137,8 +152,8 @@ mus = tl.get_mu(u,v)
 trees = [dt.rec_vertices(T, 275/2, tl.rec_tree_paren(T, [i+1 for i in range(n)]), 275/2, None, [], []) for T in line]
 heights = [tl.get_heights(x) for x in line]
 
-for m in mus:
-	print(mus.index(m), m, ": ", u[m] - v[m])
+# for m in mus:
+# 	print(mus.index(m), m, ": ", u[m] - v[m])
 
 global left_index, curr_index, right_index, mu
 
